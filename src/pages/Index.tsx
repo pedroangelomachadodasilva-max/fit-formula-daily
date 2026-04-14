@@ -1,16 +1,53 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { AppProvider, useApp } from "@/contexts/AppContext";
+import { AppHeader } from "@/components/AppHeader";
+import { BottomNav } from "@/components/BottomNav";
+import { FloatingButtons } from "@/components/FloatingButtons";
+import { HomeScreen } from "@/screens/HomeScreen";
+import { TeaScreen } from "@/screens/TeaScreen";
+import { MealsScreen } from "@/screens/MealsScreen";
+import { ExercisesScreen } from "@/screens/ExercisesScreen";
+import { CameraScreen } from "@/screens/CameraScreen";
+import { ProgressScreen } from "@/screens/ProgressScreen";
+import { SearchOverlay, FavoritesOverlay, ProfileOverlay, ChatOverlay, UpsellsOverlay, CompulsionOverlay } from "@/screens/Overlays";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const AppContent = () => {
+  const { activeTab, showSearch, showFavorites, showProfile, showChat, subScreen } = useApp();
+
+  const renderScreen = () => {
+    switch (activeTab) {
+      case "home": return <HomeScreen />;
+      case "tea": return <TeaScreen />;
+      case "meals": return <MealsScreen />;
+      case "exercises": return <ExercisesScreen />;
+      case "camera": return <CameraScreen />;
+      case "progress": return <ProgressScreen />;
+      default: return <HomeScreen />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="app-container">
+      <AppHeader />
+      <main className="min-h-screen">
+        {renderScreen()}
+      </main>
+      <FloatingButtons />
+      <BottomNav />
+
+      {showSearch && <SearchOverlay />}
+      {showFavorites && <FavoritesOverlay />}
+      {showProfile && <ProfileOverlay />}
+      {showChat && <ChatOverlay />}
+      {subScreen === "upsells" && <UpsellsOverlay />}
+      {subScreen === "compulsion" && <CompulsionOverlay />}
     </div>
   );
 };
 
-const Index = PlaceholderIndex;
+const Index = () => (
+  <AppProvider>
+    <AppContent />
+  </AppProvider>
+);
 
 export default Index;
