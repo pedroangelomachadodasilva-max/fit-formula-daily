@@ -6,6 +6,7 @@ import { marmitaRecipes, desserts } from "@/data/marmitas";
 import { mealPlanDays, allowedFoods, avoidFoods } from "@/data/mealPlan";
 import { teas } from "@/data/teas";
 import { Heart, ArrowLeft, Lock, Check, ChevronRight } from "lucide-react";
+import { FoodImage } from "@/components/FoodImage";
 
 type MealFilter = "all" | "breakfast" | "lunch" | "snack" | "dinner" | "lowcarb" | "dessert" | "tea";
 
@@ -24,7 +25,7 @@ const RecipeCard = ({ recipe, onSelect }: { recipe: Recipe; onSelect: () => void
   const { appState } = useApp();
   return (
     <button onClick={onSelect} className="card-elevated w-full text-left flex items-center gap-3 active:scale-[0.98] transition-transform">
-      <span className="text-3xl">{recipe.image}</span>
+      <FoodImage src={recipe.image} alt={recipe.name} size="md" />
       <div className="flex-1 min-w-0">
         <h4 className="font-bold text-foreground text-sm">{recipe.name}</h4>
         <p className="text-xs text-muted-foreground">{recipe.categoryLabel} • {recipe.time}</p>
@@ -45,7 +46,7 @@ const RecipeDetail = ({ recipe, onBack }: { recipe: Recipe; onBack: () => void }
         <ArrowLeft className="w-4 h-4" /> Voltar
       </button>
       <div className="text-center mb-6">
-        <span className="text-6xl">{recipe.image}</span>
+        <FoodImage src={recipe.image} alt={recipe.name} size="xl" className="mx-auto" />
         <h2 className="text-xl font-heading font-bold mt-3 text-foreground">{recipe.name}</h2>
         <div className="flex items-center justify-center gap-3 mt-2">
           <span className="badge-unlocked">{recipe.categoryLabel}</span>
@@ -196,7 +197,6 @@ export const MealsScreen = () => {
     <div className="screen-content space-y-4 animate-fade-in">
       <h2 className="text-xl font-heading font-bold text-foreground">🍽️ Refeições</h2>
 
-      {/* Filters */}
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
         {filters.map(f => (
           <button key={f.id} onClick={() => setFilter(f.id)} className={`filter-chip whitespace-nowrap ${filter === f.id ? "filter-chip-active" : "filter-chip-inactive"}`}>
@@ -205,7 +205,6 @@ export const MealsScreen = () => {
         ))}
       </div>
 
-      {/* Planning shortcut */}
       <button onClick={() => setSubScreen("planning")} className="card-highlight w-full text-left flex items-center justify-between">
         <div>
           <p className="font-bold text-foreground text-sm">📋 Planejamento de 14 Dias</p>
@@ -214,27 +213,25 @@ export const MealsScreen = () => {
         <ChevronRight className="w-5 h-5 text-primary" />
       </button>
 
-      {/* Marmitas shortcut */}
       <div className="card-elevated">
         <h3 className="font-bold text-foreground text-sm mb-2">🥡 Marmitas Fit</h3>
         <p className="text-xs text-muted-foreground mb-3">Refeições práticas para o dia a dia</p>
         <div className="space-y-2">
           {[...marmitaRecipes.breakfast, ...marmitaRecipes.lunch, ...marmitaRecipes.dinner].slice(0, 3).map(r => (
             <div key={r.id} className="flex items-center gap-3 bg-muted rounded-xl p-2">
-              <span className="text-xl">{r.image}</span>
+              <FoodImage src={r.image} alt={r.name} size="sm" />
               <span className="text-sm font-medium text-foreground">{r.name}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Salads shortcut */}
       <div className="card-elevated">
         <h3 className="font-bold text-foreground text-sm mb-2">🥗 Saladas</h3>
         <div className="flex gap-2 overflow-x-auto pb-2">
           {salads.slice(0, 4).map(s => (
             <div key={s.id} className="min-w-[140px] bg-muted rounded-xl p-3 text-center">
-              <span className="text-2xl">{s.image}</span>
+              <FoodImage src={s.image} alt={s.name} size="md" className="mx-auto" />
               <p className="text-xs font-medium text-foreground mt-1 truncate">{s.name}</p>
               {s.isMainMeal && <span className="text-xs text-primary">⭐ Refeição completa</span>}
             </div>
@@ -242,7 +239,6 @@ export const MealsScreen = () => {
         </div>
       </div>
 
-      {/* Recipes */}
       {filter === "dessert" ? (
         <div className="space-y-3">
           <h3 className="section-title">🍰 Doces Fitness</h3>
@@ -261,7 +257,7 @@ export const MealsScreen = () => {
         <div className="space-y-3">
           {teas.map(t => (
             <div key={t.id} className="card-elevated flex items-center gap-3">
-              <span className="text-2xl">{t.image}</span>
+              <FoodImage src={t.image} alt={t.name} size="md" />
               <div className="flex-1">
                 <p className="font-bold text-foreground text-sm">{t.name}</p>
                 <p className="text-xs text-muted-foreground">{t.shortDescription}</p>

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useApp } from "@/contexts/AppContext";
 import { exercises, exerciseBenefits, exerciseSafetyWarnings, Exercise } from "@/data/exercises";
-import { Heart, Check, ArrowLeft, AlertTriangle, Filter } from "lucide-react";
+import { Heart, Check, ArrowLeft, AlertTriangle } from "lucide-react";
+import { FoodImage } from "@/components/FoodImage";
 
 type ExFilter = "all" | "beginner" | "intermediate" | "advanced";
 type MuscleFilter = "all" | "legs" | "abs" | "arms" | "full";
@@ -16,7 +17,7 @@ const ExerciseDetail = ({ exercise, onBack }: { exercise: Exercise; onBack: () =
         <ArrowLeft className="w-4 h-4" /> Voltar
       </button>
       <div className="text-center mb-6">
-        <span className="text-6xl">{exercise.image}</span>
+        <FoodImage src={exercise.image} alt={exercise.name} size="xl" className="mx-auto" />
         <h2 className="text-xl font-heading font-bold mt-3 text-foreground">{exercise.name}</h2>
         <div className="flex items-center justify-center gap-2 mt-2">
           <span className="badge-unlocked">{exercise.levelLabel}</span>
@@ -85,7 +86,6 @@ export const ExercisesScreen = () => {
     <div className="screen-content space-y-4 animate-fade-in">
       <h2 className="text-xl font-heading font-bold text-foreground">💪 Exercícios em Casa</h2>
 
-      {/* Safety */}
       <button onClick={() => setShowSafety(!showSafety)} className="card-elevated w-full text-left border-accent/30">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-accent" />
@@ -100,7 +100,6 @@ export const ExercisesScreen = () => {
         )}
       </button>
 
-      {/* Benefits */}
       <div className="card-highlight">
         <h3 className="font-bold text-foreground text-sm mb-2">✨ Benefícios</h3>
         <div className="flex flex-wrap gap-2">
@@ -110,7 +109,6 @@ export const ExercisesScreen = () => {
         </div>
       </div>
 
-      {/* Level filter */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {([
           { id: "all" as ExFilter, label: "Todos" },
@@ -124,7 +122,6 @@ export const ExercisesScreen = () => {
         ))}
       </div>
 
-      {/* Muscle filter */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {([
           { id: "all" as MuscleFilter, label: "Todos" },
@@ -139,13 +136,12 @@ export const ExercisesScreen = () => {
         ))}
       </div>
 
-      {/* Exercise list */}
       <div className="space-y-3">
         {filtered.map(ex => {
           const isDone = appState.state.dailyLog.exercisesDone.includes(ex.id);
           return (
             <button key={ex.id} onClick={() => setSelected(ex)} className="card-elevated w-full text-left flex items-center gap-3 active:scale-[0.98] transition-transform">
-              <span className="text-3xl">{ex.image}</span>
+              <FoodImage src={ex.image} alt={ex.name} size="md" />
               <div className="flex-1">
                 <h4 className="font-bold text-foreground text-sm">{ex.name}</h4>
                 <p className="text-xs text-muted-foreground">{ex.levelLabel} • {ex.sets}x{ex.reps}</p>
