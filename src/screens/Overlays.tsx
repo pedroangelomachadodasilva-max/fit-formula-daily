@@ -7,6 +7,7 @@ import { exercises } from "@/data/exercises";
 import { compulsionTips } from "@/data/compulsion";
 import { useState } from "react";
 import { Lock } from "lucide-react";
+import { FoodImage } from "@/components/FoodImage";
 
 export const SearchOverlay = () => {
   const { setShowSearch } = useApp();
@@ -15,10 +16,10 @@ export const SearchOverlay = () => {
   const filters = ["todos", "chá", "refeições", "low carb", "saladas", "doces", "exercícios", "planejamento", "compulsão alimentar", "upsells"];
 
   const allItems = [
-    ...teas.map(t => ({ id: t.id, name: t.name, type: "chá", emoji: t.image })),
-    ...lowCarbRecipes.map(r => ({ id: r.id, name: r.name, type: "low carb", emoji: r.image })),
-    ...salads.map(s => ({ id: s.id, name: s.name, type: "saladas", emoji: s.image })),
-    ...exercises.map(e => ({ id: e.id, name: e.name, type: "exercícios", emoji: e.image })),
+    ...teas.map(t => ({ id: t.id, name: t.name, type: "chá", image: t.image })),
+    ...lowCarbRecipes.map(r => ({ id: r.id, name: r.name, type: "low carb", image: r.image })),
+    ...salads.map(s => ({ id: s.id, name: s.name, type: "saladas", image: s.image })),
+    ...exercises.map(e => ({ id: e.id, name: e.name, type: "exercícios", image: e.image })),
   ];
 
   const filtered = allItems.filter(i => {
@@ -42,7 +43,7 @@ export const SearchOverlay = () => {
         <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-4">
           {filtered.map(i => (
             <div key={i.id} className="card-elevated flex items-center gap-3">
-              <span className="text-2xl">{i.emoji}</span>
+              <FoodImage src={i.image} alt={i.name} size="sm" />
               <div><p className="text-sm font-medium text-foreground">{i.name}</p><p className="text-xs text-muted-foreground">{i.type}</p></div>
             </div>
           ))}
@@ -57,10 +58,10 @@ export const FavoritesOverlay = () => {
   const { setShowFavorites, appState } = useApp();
   const { state } = appState;
   const allItems = [
-    ...teas.map(t => ({ id: t.id, name: t.name, section: "Chás", emoji: t.image })),
-    ...lowCarbRecipes.map(r => ({ id: r.id, name: r.name, section: "Receitas", emoji: r.image })),
-    ...salads.map(s => ({ id: s.id, name: s.name, section: "Saladas", emoji: s.image })),
-    ...exercises.map(e => ({ id: e.id, name: e.name, section: "Exercícios", emoji: e.image })),
+    ...teas.map(t => ({ id: t.id, name: t.name, section: "Chás", image: t.image })),
+    ...lowCarbRecipes.map(r => ({ id: r.id, name: r.name, section: "Receitas", image: r.image })),
+    ...salads.map(s => ({ id: s.id, name: s.name, section: "Saladas", image: s.image })),
+    ...exercises.map(e => ({ id: e.id, name: e.name, section: "Exercícios", image: e.image })),
   ];
   const favItems = allItems.filter(i => state.favorites.includes(i.id));
   const sections = [...new Set(favItems.map(i => i.section))];
@@ -80,7 +81,7 @@ export const FavoritesOverlay = () => {
               <div className="space-y-2">
                 {favItems.filter(i => i.section === s).map(i => (
                   <div key={i.id} className="card-elevated flex items-center gap-3">
-                    <span className="text-2xl">{i.emoji}</span>
+                    <FoodImage src={i.image} alt={i.name} size="sm" />
                     <span className="text-sm font-medium text-foreground">{i.name}</span>
                   </div>
                 ))}
@@ -190,7 +191,6 @@ export const UpsellsOverlay = () => {
           <button onClick={() => setSubScreen(null)}><X className="w-5 h-5 text-foreground" /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-          {/* Compulsion - always available */}
           <button onClick={() => setSubScreen("compulsion")} className="card-highlight w-full text-left">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🧠</span>
@@ -200,7 +200,6 @@ export const UpsellsOverlay = () => {
               </div>
             </div>
           </button>
-          {/* Doces */}
           <div className={`card-elevated ${!state.access.doces ? "opacity-60" : ""}`}>
             <div className="flex items-center gap-3">
               <span className="text-3xl">🍰</span>
@@ -211,7 +210,6 @@ export const UpsellsOverlay = () => {
               {!state.access.doces && <Lock className="w-5 h-5 text-muted-foreground" />}
             </div>
           </div>
-          {/* Pele */}
           <div className={`card-elevated ${!state.access.peleFlacida ? "opacity-60" : ""}`}>
             <div className="flex items-center gap-3">
               <span className="text-3xl">✨</span>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useApp } from "@/contexts/AppContext";
 import { teas, teaGuidelines, teaGeneralContraindications, Tea } from "@/data/teas";
 import { Heart, Check, ArrowLeft, AlertTriangle, Info } from "lucide-react";
+import { FoodImage } from "@/components/FoodImage";
 
 const TeaDetail = ({ tea, onBack }: { tea: Tea; onBack: () => void }) => {
   const { appState } = useApp();
@@ -14,7 +15,7 @@ const TeaDetail = ({ tea, onBack }: { tea: Tea; onBack: () => void }) => {
         <ArrowLeft className="w-4 h-4" /> Voltar
       </button>
       <div className="text-center mb-6">
-        <span className="text-6xl">{tea.image}</span>
+        <FoodImage src={tea.image} alt={tea.name} size="xl" className="mx-auto" />
         <h2 className="text-xl font-heading font-bold mt-3 text-foreground">{tea.name}</h2>
         <p className="text-sm text-muted-foreground mt-1">{tea.shortDescription}</p>
       </div>
@@ -87,13 +88,11 @@ export const TeaScreen = () => {
 
   return (
     <div className="screen-content space-y-4 animate-fade-in">
-      {/* Banner */}
       <div className="bg-gradient-to-br from-primary to-primary-dark rounded-2xl p-5 text-primary-foreground">
         <h2 className="text-xl font-heading font-bold">🍵 Chás Funcionais</h2>
         <p className="text-sm opacity-90 mt-1">7 chás poderosos para acelerar seu emagrecimento</p>
       </div>
 
-      {/* Tea of the day */}
       <div className="card-highlight">
         <p className="text-xs font-medium text-primary uppercase tracking-wider">Chá do dia</p>
         <div className="flex items-center justify-between mt-2">
@@ -103,11 +102,10 @@ export const TeaScreen = () => {
               {state.dailyLog.teasDrunk.length} chá(s) tomado(s) hoje
             </p>
           </div>
-          <span className="text-3xl">{teas[new Date().getDay() % teas.length].image}</span>
+          <FoodImage src={teas[new Date().getDay() % teas.length].image} alt="Chá do dia" size="md" />
         </div>
       </div>
 
-      {/* Guidelines & Contraindications */}
       <button onClick={() => setShowGuidelines(!showGuidelines)} className="card-elevated w-full text-left">
         <div className="flex items-center gap-2">
           <Info className="w-5 h-5 text-primary" />
@@ -131,7 +129,6 @@ export const TeaScreen = () => {
         )}
       </button>
 
-      {/* Tea list */}
       <div>
         <h3 className="section-title mb-3">Os 7 Chás</h3>
         <div className="space-y-3">
@@ -139,7 +136,7 @@ export const TeaScreen = () => {
             const isDrunk = state.dailyLog.teasDrunk.includes(tea.id);
             return (
               <button key={tea.id} onClick={() => setSelectedTea(tea)} className="card-elevated w-full text-left flex items-center gap-4 active:scale-[0.98] transition-transform">
-                <span className="text-3xl">{tea.image}</span>
+                <FoodImage src={tea.image} alt={tea.name} size="md" />
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-foreground text-sm">{tea.name}</h4>
                   <p className="text-xs text-muted-foreground truncate">{tea.shortDescription}</p>

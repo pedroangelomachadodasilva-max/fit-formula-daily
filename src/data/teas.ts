@@ -1,3 +1,11 @@
+import teaLeanFit from "@/assets/teas/lean-fit.jpg";
+import teaDiuretico from "@/assets/teas/diuretico.jpg";
+import teaBranco from "@/assets/teas/cha-branco.jpg";
+import teaAbacaxi from "@/assets/teas/casca-abacaxi.jpg";
+import teaMatcha from "@/assets/teas/matcha.jpg";
+import teaSpirulina from "@/assets/teas/spirulina.jpg";
+import teaCentella from "@/assets/teas/centella.jpg";
+
 export interface Tea {
   id: string;
   name: string;
@@ -31,7 +39,7 @@ export const teas: Tea[] = [
     benefits: ["Inibe o apetite", "Auxilia na perda de peso", "Regula colesterol", "Melhora energia", "Fortalece sistema imunológico", "Combate envelhecimento", "Diminui ansiedade", "Antioxidante", "Combate retenção de líquido"],
     contraindications: ["Gestantes", "Lactantes com bebê menor de 8 meses", "Pessoas com remédio controlado", "Pessoas em tratamento de doenças graves", "Hipertensos", "Pessoas com problemas renais", "Pessoas com problemas cardíacos"],
     recommendedTime: "Até 17h",
-    image: "🍵"
+    image: teaLeanFit
   },
   {
     id: "diuretico-barriga-lisa",
@@ -43,7 +51,7 @@ export const teas: Tea[] = [
     benefits: ["Diurético", "Auxilia na perda de peso", "Reduz colesterol e estresse", "Auxilia controle de pressão arterial e glicemia", "Auxilia função intestinal", "Diminui vontade de comer doce", "Fortalece sistema imunológico", "Ajuda a tratar infecções urinárias"],
     contraindications: ["Pessoas com doenças cardíacas", "Pessoas com doenças renais", "Pessoas com pressão baixa", "Mulheres grávidas", "Mulheres que amamentam", "Pessoas em tratamento de câncer"],
     recommendedTime: "Manhã e tarde",
-    image: "🌿"
+    image: teaDiuretico
   },
   {
     id: "cha-branco",
@@ -55,7 +63,7 @@ export const teas: Tea[] = [
     benefits: ["Anti-inflamatório", "Melhora humor", "Controla colesterol", "Protege sistema imunológico", "Antioxidante", "Diurético", "Ajuda desinchar", "Auxilia no emagrecimento"],
     contraindications: ["Pessoas com pressão alta", "Úlceras gástricas", "Problemas cardíacos", "Insônia", "Não ingerir após as refeições"],
     recommendedTime: "Entre as refeições",
-    image: "🫖"
+    image: teaBranco
   },
   {
     id: "casca-abacaxi",
@@ -67,7 +75,7 @@ export const teas: Tea[] = [
     benefits: ["Diurético", "Combate inchaço", "Reduz apetite", "Termogênico", "Antioxidante"],
     contraindications: ["Hipertensos", "Gestantes", "Lactantes", "Pessoas com gastrite", "Pessoas com úlcera", "Pessoas com refluxo"],
     recommendedTime: "Até 17h",
-    image: "🍍"
+    image: teaAbacaxi
   },
   {
     id: "matcha",
@@ -79,7 +87,7 @@ export const teas: Tea[] = [
     benefits: ["Auxilia na perda de peso", "Aumenta energia", "Reduz estresse", "Melhora memória", "Antioxidante", "Ajuda a diminuir colesterol"],
     contraindications: ["Pessoas hipertensas", "Pessoas com hipertireoidismo", "Pessoas com insônia (contém cafeína)"],
     recommendedTime: "30 min antes do almoço",
-    image: "🍃"
+    image: teaMatcha
   },
   {
     id: "spirulina",
@@ -91,7 +99,7 @@ export const teas: Tea[] = [
     benefits: ["Ajuda a reduzir fome", "Desintoxica", "Auxilia na perda de peso", "Reduz inflamações", "Aumenta imunidade"],
     contraindications: ["Fenilcetonúria", "Doenças autoimunes", "Gestantes", "Lactantes"],
     recommendedTime: "Manhã e tarde",
-    image: "💚"
+    image: teaSpirulina
   },
   {
     id: "centella",
@@ -103,7 +111,7 @@ export const teas: Tea[] = [
     benefits: ["Anti-inflamatório", "Ação cicatrizante", "Diminui ansiedade", "Auxilia no emagrecimento", "Benefício estético para a pele"],
     contraindications: ["Mulheres grávidas", "Mulheres amamentando", "Pessoas com problemas no fígado", "Pessoas com problemas nos rins"],
     recommendedTime: "Manhã e tarde",
-    image: "🌱"
+    image: teaCentella
   }
 ];
 
