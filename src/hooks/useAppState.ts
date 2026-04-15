@@ -15,9 +15,11 @@ interface AppState {
   favorites: string[];
   dailyLog: DailyLog;
   weightHistory: { date: string; weight: number }[];
+  calorieGoal: number;
   profile: {
     name: string; email: string; age: number; gender: string;
     height: number; initialWeight: number; goal: string; activityLevel: string;
+    password?: string;
   };
   access: {
     main: boolean; doces: boolean; peleFlacida: boolean;
@@ -48,9 +50,11 @@ const defaultState: AppState = {
     { date: "2025-04-10", weight: 73.8 },
     { date: "2025-04-12", weight: 73.5 },
   ],
+  calorieGoal: 1500,
   profile: {
     name: "Maria", email: "maria@email.com", age: 32, gender: "feminino",
-    height: 165, initialWeight: 75, goal: "Perder 10kg", activityLevel: "moderado"
+    height: 165, initialWeight: 75, goal: "Perder 10kg", activityLevel: "moderado",
+    password: "••••••••"
   },
   access: {
     main: true, doces: false, peleFlacida: false,
@@ -160,6 +164,10 @@ export function useAppState() {
     setState(s => ({ ...s, profile: { ...s.profile, ...profile } }));
   }, []);
 
+  const setCalorieGoal = useCallback((goal: number) => {
+    setState(s => ({ ...s, calorieGoal: goal }));
+  }, []);
+
   const isFavorite = useCallback((id: string) => state.favorites.includes(id), [state.favorites]);
 
   const totalCalories = state.dailyLog.calories.breakfast + state.dailyLog.calories.lunch +
@@ -168,6 +176,6 @@ export function useAppState() {
   return {
     state, setState, toggleFavorite, addWater, setWeight, addCalories,
     markTeaDrunk, markExerciseDone, toggleHabit, updateProfile,
-    isFavorite, totalCalories
+    isFavorite, totalCalories, setCalorieGoal
   };
 }

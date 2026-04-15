@@ -1,4 +1,4 @@
-import { Droplets, Scale, Flame, BookOpen, Check } from "lucide-react";
+import { Droplets, Scale, Flame, BookOpen, Check, Pencil } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
 import { teas } from "@/data/teas";
 import { useState } from "react";
@@ -10,7 +10,9 @@ export const HomeScreen = () => {
   const todayTea = teas[new Date().getDay() % teas.length];
   const [weightInput, setWeightInput] = useState("");
   const [showWeightInput, setShowWeightInput] = useState(false);
-  const calorieGoal = 1500;
+  const [showCalorieEdit, setShowCalorieEdit] = useState(false);
+  const [calorieGoalInput, setCalorieGoalInput] = useState("");
+  const calorieGoal = state.calorieGoal || 1500;
 
   return (
     <div className="screen-content space-y-4 animate-fade-in">
@@ -65,27 +67,6 @@ export const HomeScreen = () => {
         </button>
       </div>
 
-      {/* Water */}
-      <div className="card-elevated">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Droplets className="w-5 h-5 text-blue-500" />
-            <h3 className="font-bold text-foreground">Água</h3>
-          </div>
-          <span className="text-sm font-semibold text-foreground">{state.dailyLog.water} / 2000 ml</span>
-        </div>
-        <div className="progress-bar mb-3">
-          <div className="progress-fill bg-gradient-to-r from-blue-400 to-blue-500" style={{ width: `${Math.min(100, (state.dailyLog.water / 2000) * 100)}%` }} />
-        </div>
-        <div className="flex gap-2">
-          {[200, 300, 500].map(ml => (
-            <button key={ml} onClick={() => addWater(ml)} className="flex-1 text-xs font-medium py-2 rounded-xl bg-blue-50 text-blue-600 active:bg-blue-100">
-              +{ml}ml
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Weight */}
       <div className="card-elevated">
         <div className="flex items-center justify-between">
@@ -111,6 +92,27 @@ export const HomeScreen = () => {
         )}
       </div>
 
+      {/* Water */}
+      <div className="card-elevated">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Droplets className="w-5 h-5 text-blue-500" />
+            <h3 className="font-bold text-foreground">Água</h3>
+          </div>
+          <span className="text-sm font-semibold text-foreground">{state.dailyLog.water} / 2000 ml</span>
+        </div>
+        <div className="progress-bar mb-3">
+          <div className="progress-fill bg-gradient-to-r from-blue-400 to-blue-500" style={{ width: `${Math.min(100, (state.dailyLog.water / 2000) * 100)}%` }} />
+        </div>
+        <div className="flex gap-2">
+          {[200, 300, 500].map(ml => (
+            <button key={ml} onClick={() => addWater(ml)} className="flex-1 text-xs font-medium py-2 rounded-xl bg-blue-50 text-blue-600 active:bg-blue-100">
+              +{ml}ml
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Calories */}
       <div className="card-elevated">
         <div className="flex items-center justify-between mb-3">
@@ -118,8 +120,21 @@ export const HomeScreen = () => {
             <Flame className="w-5 h-5 text-orange-500" />
             <h3 className="font-bold text-foreground">Calorias do Dia</h3>
           </div>
-          <span className="text-sm font-semibold text-foreground">{totalCalories} / {calorieGoal} kcal</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-foreground">{totalCalories} / {calorieGoal} kcal</span>
+            <button onClick={() => { setShowCalorieEdit(!showCalorieEdit); setCalorieGoalInput(calorieGoal.toString()); }} className="p-1 rounded-lg hover:bg-muted">
+              <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </div>
         </div>
+        {showCalorieEdit && (
+          <div className="flex gap-2 mb-3">
+            <input type="number" value={calorieGoalInput} onChange={e => setCalorieGoalInput(e.target.value)} className="flex-1 px-3 py-2 rounded-xl bg-muted text-foreground text-sm outline-none" placeholder="Meta kcal" />
+            <button onClick={() => { if (calorieGoalInput) { appState.setCalorieGoal(parseInt(calorieGoalInput)); setShowCalorieEdit(false); } }} className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium">
+              Salvar
+            </button>
+          </div>
+        )}
         <div className="progress-bar mb-3">
           <div className="h-full rounded-full bg-gradient-to-r from-orange-400 to-accent transition-all duration-500" style={{ width: `${Math.min(100, (totalCalories / calorieGoal) * 100)}%` }} />
         </div>
@@ -134,26 +149,6 @@ export const HomeScreen = () => {
               <p className="text-xs text-muted-foreground">{m.label}</p>
               <p className="text-sm font-bold text-foreground">{m.val}</p>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick shortcuts */}
-      <div>
-        <h3 className="section-title mb-3">Atalhos</h3>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Refeições", icon: "🍽️", action: () => setActiveTab("meals") },
-            { label: "Planejamento", icon: "📋", action: () => { setActiveTab("meals"); setSubScreen("planning"); } },
-            { label: "Scanner", icon: "📸", action: () => setActiveTab("camera") },
-            { label: "Exercícios", icon: "💪", action: () => setActiveTab("exercises") },
-            { label: "Progresso", icon: "📈", action: () => setActiveTab("progress") },
-            { label: "Upsells", icon: "🎁", action: () => setSubScreen("upsells") },
-          ].map(s => (
-            <button key={s.label} onClick={s.action} className="card-elevated flex flex-col items-center gap-2 py-4 active:scale-95 transition-transform">
-              <span className="text-2xl">{s.icon}</span>
-              <span className="text-xs font-medium text-foreground">{s.label}</span>
-            </button>
           ))}
         </div>
       </div>
@@ -183,6 +178,26 @@ export const HomeScreen = () => {
               }`}>
                 {state.dailyLog.habits[h.key] && <Check className="w-3 h-3 text-primary-foreground" />}
               </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick shortcuts */}
+      <div>
+        <h3 className="section-title mb-3">Atalhos</h3>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: "Refeições", icon: "🍽️", action: () => setActiveTab("meals") },
+            { label: "Planejamento", icon: "📋", action: () => { setActiveTab("meals"); setSubScreen("planning"); } },
+            { label: "Scanner", icon: "📸", action: () => setActiveTab("camera") },
+            { label: "Exercícios", icon: "💪", action: () => setActiveTab("exercises") },
+            { label: "Progresso", icon: "📈", action: () => setActiveTab("progress") },
+            { label: "Upsells", icon: "🎁", action: () => setSubScreen("upsells") },
+          ].map(s => (
+            <button key={s.label} onClick={s.action} className="card-elevated flex flex-col items-center gap-2 py-4 active:scale-95 transition-transform">
+              <span className="text-2xl">{s.icon}</span>
+              <span className="text-xs font-medium text-foreground">{s.label}</span>
             </button>
           ))}
         </div>

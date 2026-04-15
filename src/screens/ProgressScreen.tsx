@@ -1,12 +1,124 @@
 import { useState } from "react";
 import { useApp } from "@/contexts/AppContext";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 
 type ProgressTab = "daily" | "weekly" | "monthly";
+
+const dayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+const WeeklyBarChart = () => {
+  // Mock weekly data
+  const weekData = [
+    { day: "Seg", score: 60 },
+    { day: "Ter", score: 80 },
+    { day: "Qua", score: 45 },
+    { day: "Qui", score: 90 },
+    { day: "Sex", score: 70 },
+    { day: "Sáb", score: 55 },
+    { day: "Dom", score: 85 },
+  ];
+  const max = Math.max(...weekData.map(d => d.score));
+
+  return (
+    <div className="card-elevated">
+      <h3 className="font-bold text-foreground mb-4">📊 Desempenho da Semana</h3>
+      <div className="flex items-end gap-2 h-40">
+        {weekData.map((d) => {
+          const height = (d.score / max) * 100;
+          const isGood = d.score >= 70;
+          return (
+            <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
+              <span className="text-xs font-semibold text-foreground">{d.score}%</span>
+              <div className="w-full rounded-t-lg relative" style={{ height: `${height}%` }}>
+                <div className={`w-full h-full rounded-t-lg ${isGood ? "bg-gradient-to-t from-primary to-primary-light" : "bg-gradient-to-t from-muted-foreground/30 to-muted-foreground/20"}`} />
+              </div>
+              <span className="text-xs text-muted-foreground font-medium">{d.day}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const MonthlyView = ({ onBack }: { onBack: () => void }) => {
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+
+  const weeks = [
+    { week: 1, label: "Semana 1 (1-7)", score: 72, details: { water: 85, calories: 70, exercise: 60, tea: 80, habits: 65 } },
+    { week: 2, label: "Semana 2 (8-14)", score: 78, details: { water: 90, calories: 75, exercise: 70, tea: 85, habits: 70 } },
+    { week: 3, label: "Semana 3 (15-21)", score: 65, details: { water: 70, calories: 60, exercise: 55, tea: 75, habits: 60 } },
+    { week: 4, label: "Semana 4 (22-28)", score: 82, details: { water: 92, calories: 80, exercise: 75, tea: 88, habits: 78 } },
+  ];
+
+  if (selectedWeek !== null) {
+    const w = weeks[selectedWeek];
+    return (
+      <div className="screen-content animate-slide-up space-y-4">
+        <button onClick={() => setSelectedWeek(null)} className="flex items-center gap-2 text-primary mb-2">
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </button>
+        <h2 className="text-xl font-heading font-bold text-foreground">{w.label}</h2>
+        <div className="card-highlight text-center">
+          <p className="text-xs text-muted-foreground">Adesão geral</p>
+          <p className="text-3xl font-bold text-primary">{w.score}%</p>
+        </div>
+        <div className="space-y-3">
+          {[
+            { label: "💧 Água", val: w.details.water },
+            { label: "🔥 Calorias", val: w.details.calories },
+            { label: "🏋️ Exercícios", val: w.details.exercise },
+            { label: "🍵 Chás", val: w.details.tea },
+            { label: "✅ Hábitos", val: w.details.habits },
+          ].map(item => (
+            <div key={item.label} className="card-elevated">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-foreground">{item.label}</span>
+                <span className="text-sm font-bold text-primary">{item.val}%</span>
+              </div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${item.val}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="screen-content animate-slide-up space-y-4">
+      <button onClick={onBack} className="flex items-center gap-2 text-primary mb-2">
+        <ArrowLeft className="w-4 h-4" /> Voltar
+      </button>
+      <h2 className="text-xl font-heading font-bold text-foreground">📅 Desempenho Mensal</h2>
+      <div className="space-y-3">
+        {weeks.map((w, i) => (
+          <button key={w.week} onClick={() => setSelectedWeek(i)} className="card-elevated w-full text-left flex items-center justify-between active:scale-[0.98] transition-transform">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm ${w.score >= 75 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                {w.score}%
+              </div>
+              <div>
+                <p className="font-bold text-foreground text-sm">{w.label}</p>
+                <p className="text-xs text-muted-foreground">Toque para ver detalhes</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const ProgressScreen = () => {
   const { appState } = useApp();
   const { state, totalCalories } = appState;
   const [tab, setTab] = useState<ProgressTab>("daily");
+  const [showMonthly, setShowMonthly] = useState(false);
+
+  if (showMonthly) return <MonthlyView onBack={() => setShowMonthly(false)} />;
 
   const completedHabits = Object.values(state.dailyLog.habits).filter(Boolean).length;
   const totalHabits = 5;
@@ -17,14 +129,16 @@ export const ProgressScreen = () => {
       <h2 className="text-xl font-heading font-bold text-foreground">📈 Progresso</h2>
 
       <div className="flex gap-2">
-        {(["daily", "weekly", "monthly"] as const).map(t => (
+        {(["daily", "weekly"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} className={`filter-chip flex-1 text-center ${tab === t ? "filter-chip-active" : "filter-chip-inactive"}`}>
-            {{ daily: "Diário", weekly: "Semanal", monthly: "Mensal" }[t]}
+            {{ daily: "Diário", weekly: "Semanal" }[t]}
           </button>
         ))}
       </div>
 
-      {/* Weight chart placeholder */}
+      {tab === "weekly" && <WeeklyBarChart />}
+
+      {/* Weight chart */}
       <div className="card-elevated">
         <h3 className="font-bold text-foreground mb-3">⚖️ Peso</h3>
         <div className="flex items-end gap-1 h-32">
@@ -57,7 +171,7 @@ export const ProgressScreen = () => {
           <p className="text-3xl font-bold text-accent">{totalCalories}</p>
           <p className="text-xs text-muted-foreground mt-1">kcal consumidas</p>
           <div className="progress-bar mt-2">
-            <div className="h-full rounded-full bg-gradient-to-r from-orange-400 to-accent" style={{ width: `${Math.min(100, (totalCalories / 1500) * 100)}%` }} />
+            <div className="h-full rounded-full bg-gradient-to-r from-orange-400 to-accent" style={{ width: `${Math.min(100, (totalCalories / (state.calorieGoal || 1500)) * 100)}%` }} />
           </div>
         </div>
         <div className="card-elevated text-center">
@@ -103,6 +217,15 @@ export const ProgressScreen = () => {
           </div>
         ))}
       </div>
+
+      {/* Monthly link */}
+      <button onClick={() => setShowMonthly(true)} className="card-elevated w-full text-left flex items-center justify-between active:scale-[0.98] transition-transform">
+        <div>
+          <p className="font-bold text-foreground text-sm">📅 Ver desempenho mensal</p>
+          <p className="text-xs text-muted-foreground mt-1">Analise seu progresso por semana</p>
+        </div>
+        <ChevronRight className="w-5 h-5 text-primary" />
+      </button>
     </div>
   );
 };
