@@ -56,9 +56,9 @@ const RecipeGridCard = ({ recipe, onSelect }: { recipe: Recipe; onSelect: () => 
 const GenericGridCard = ({ item, onSelect }: { item: { id: string; name: string; image: string; categoryLabel?: string; calories?: number; saladCategoryLabel?: string; isMainMeal?: boolean }; onSelect?: () => void }) => {
   const { appState } = useApp();
   return (
-    <div className="card-elevated overflow-hidden p-0">
+    <div className="card-elevated overflow-hidden p-0" onClick={onSelect}>
       <div className="relative">
-        <img src={item.image} alt={item.name} loading="lazy" className="w-full h-36 object-cover" onClick={onSelect} className2="cursor-pointer" />
+        <img src={item.image} alt={item.name} loading="lazy" className="w-full h-36 object-cover cursor-pointer" />
         <button
           onClick={e => { e.stopPropagation(); appState.toggleFavorite(item.id); }}
           className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
