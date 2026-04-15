@@ -1,4 +1,4 @@
-import { X, ArrowLeft } from "lucide-react";
+import { X, ArrowLeft, Pencil, Check, Eye, EyeOff, ChevronRight } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
 import { teas } from "@/data/teas";
 import { lowCarbRecipes } from "@/data/lowCarb";
@@ -96,13 +96,70 @@ export const FavoritesOverlay = () => {
 
 export const ProfileOverlay = () => {
   const { setShowProfile, appState } = useApp();
-  const { state } = appState;
+  const { state, updateProfile } = appState;
+  const [editing, setEditing] = useState(false);
+  const [showAccess, setShowAccess] = useState(false);
+  const [form, setForm] = useState({ ...state.profile });
+  const [showPassword, setShowPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [newEmail, setNewEmail] = useState(state.profile.email);
+
+  const saveProfile = () => {
+    updateProfile(form);
+    setEditing(false);
+  };
+
+  if (showAccess) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background animate-slide-up">
+        <div className="app-container h-full flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="font-heading font-bold text-foreground text-lg">🔐 Acesso</h2>
+            <button onClick={() => setShowAccess(false)}><X className="w-5 h-5 text-foreground" /></button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+            <div className="card-elevated">
+              <label className="text-xs text-muted-foreground">E-mail</label>
+              <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full mt-1 bg-muted rounded-xl px-3 py-2.5 text-foreground text-sm outline-none" />
+            </div>
+            <div className="card-elevated">
+              <label className="text-xs text-muted-foreground">Senha atual</label>
+              <div className="flex items-center gap-2 mt-1">
+                <input type={showPassword ? "text" : "password"} value="••••••••" readOnly className="flex-1 bg-muted rounded-xl px-3 py-2.5 text-foreground text-sm outline-none" />
+                <button onClick={() => setShowPassword(!showPassword)} className="p-2">
+                  {showPassword ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
+                </button>
+              </div>
+            </div>
+            <div className="card-elevated">
+              <label className="text-xs text-muted-foreground">Nova senha</label>
+              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Digite a nova senha" className="w-full mt-1 bg-muted rounded-xl px-3 py-2.5 text-foreground text-sm outline-none" />
+            </div>
+            <button onClick={() => {
+              if (newEmail) updateProfile({ email: newEmail });
+              setShowAccess(false);
+            }} className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm">
+              Salvar alterações
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-background animate-slide-up">
       <div className="app-container h-full flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="font-heading font-bold text-foreground text-lg">👤 Perfil</h2>
-          <button onClick={() => setShowProfile(false)}><X className="w-5 h-5 text-foreground" /></button>
+          <div className="flex items-center gap-2">
+            {!editing && (
+              <button onClick={() => { setForm({ ...state.profile }); setEditing(true); }} className="p-2">
+                <Pencil className="w-4 h-4 text-primary" />
+              </button>
+            )}
+            <button onClick={() => setShowProfile(false)}><X className="w-5 h-5 text-foreground" /></button>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           <div className="text-center py-4">
@@ -110,24 +167,88 @@ export const ProfileOverlay = () => {
             <h3 className="font-heading font-bold text-foreground text-xl mt-3">{state.profile.name}</h3>
             <p className="text-sm text-muted-foreground">{state.profile.email}</p>
           </div>
-          {[
-            { label: "Idade", value: `${state.profile.age} anos` },
-            { label: "Gênero", value: state.profile.gender },
-            { label: "Altura", value: `${state.profile.height} cm` },
-            { label: "Peso Inicial", value: `${state.profile.initialWeight} kg` },
-            { label: "Objetivo", value: state.profile.goal },
-            { label: "Atividade", value: state.profile.activityLevel },
-          ].map(f => (
-            <div key={f.label} className="card-elevated flex justify-between">
-              <span className="text-sm text-muted-foreground">{f.label}</span>
-              <span className="text-sm font-medium text-foreground">{f.value}</span>
+
+          {editing ? (
+            <div className="space-y-3">
+              {[
+                { label: "Nome", key: "name", type: "text" },
+                { label: "E-mail", key: "email", type: "email" },
+                { label: "Idade", key: "age", type: "number" },
+                { label: "Altura (cm)", key: "height", type: "number" },
+                { label: "Peso Inicial (kg)", key: "initialWeight", type: "number" },
+                { label: "Objetivo", key: "goal", type: "text" },
+              ].map(f => (
+                <div key={f.key} className="card-elevated">
+                  <label className="text-xs text-muted-foreground">{f.label}</label>
+                  <input
+                    type={f.type}
+                    value={(form as any)[f.key]}
+                    onChange={e => setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })}
+                    className="w-full mt-1 bg-muted rounded-xl px-3 py-2.5 text-foreground text-sm outline-none"
+                  />
+                </div>
+              ))}
+              <div className="card-elevated">
+                <label className="text-xs text-muted-foreground">Gênero</label>
+                <div className="flex gap-2 mt-1">
+                  {["feminino", "masculino"].map(g => (
+                    <button key={g} onClick={() => setForm({ ...form, gender: g })} className={`flex-1 py-2 rounded-xl text-sm font-medium ${form.gender === g ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                      {g === "feminino" ? "Feminino" : "Masculino"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="card-elevated">
+                <label className="text-xs text-muted-foreground">Nível de atividade</label>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  {["sedentario", "leve", "moderado", "ativo"].map(a => (
+                    <button key={a} onClick={() => setForm({ ...form, activityLevel: a })} className={`py-2 rounded-xl text-xs font-medium capitalize ${form.activityLevel === a ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                      {a}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setEditing(false)} className="flex-1 py-3 rounded-2xl bg-muted text-foreground font-bold text-sm">Cancelar</button>
+                <button onClick={saveProfile} className="flex-1 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2">
+                  <Check className="w-4 h-4" /> Salvar
+                </button>
+              </div>
             </div>
-          ))}
-          <div className="card-highlight">
-            <p className="text-sm font-bold text-foreground">Assinatura</p>
-            <p className="text-xs text-primary mt-1">{state.access.subscriptionActive ? "✅ Ativa" : "❌ Inativa"}</p>
-            <p className="text-xs text-muted-foreground">Vencimento: {state.access.subscriptionDueDate}</p>
-          </div>
+          ) : (
+            <>
+              {[
+                { label: "Idade", value: `${state.profile.age} anos` },
+                { label: "Gênero", value: state.profile.gender },
+                { label: "Altura", value: `${state.profile.height} cm` },
+                { label: "Peso Inicial", value: `${state.profile.initialWeight} kg` },
+                { label: "Objetivo", value: state.profile.goal },
+                { label: "Atividade", value: state.profile.activityLevel },
+              ].map(f => (
+                <div key={f.label} className="card-elevated flex justify-between">
+                  <span className="text-sm text-muted-foreground">{f.label}</span>
+                  <span className="text-sm font-medium text-foreground">{f.value}</span>
+                </div>
+              ))}
+
+              <button onClick={() => setShowAccess(true)} className="card-elevated w-full text-left flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">🔐</span>
+                  <div>
+                    <p className="font-bold text-foreground text-sm">Acesso</p>
+                    <p className="text-xs text-muted-foreground">E-mail e senha</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </button>
+
+              <div className="card-highlight">
+                <p className="text-sm font-bold text-foreground">Assinatura</p>
+                <p className="text-xs text-primary mt-1">{state.access.subscriptionActive ? "✅ Ativa" : "❌ Inativa"}</p>
+                <p className="text-xs text-muted-foreground">Vencimento: {state.access.subscriptionDueDate}</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
