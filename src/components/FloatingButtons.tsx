@@ -45,7 +45,7 @@ export const FloatingButtons = () => {
         </button>
         <button
           onClick={() => setShowChat(true)}
-          className="fab bg-primary text-primary-foreground"
+          className="fab bg-primary text-primary-foreground shadow-lg"
         >
           <MessageCircle className="w-6 h-6" />
         </button>
