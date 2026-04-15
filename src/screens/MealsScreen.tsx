@@ -53,6 +53,30 @@ const RecipeGridCard = ({ recipe, onSelect }: { recipe: Recipe; onSelect: () => 
   );
 };
 
+const GenericGridCard = ({ item, onSelect }: { item: { id: string; name: string; image: string; categoryLabel?: string; calories?: number; saladCategoryLabel?: string; isMainMeal?: boolean }; onSelect?: () => void }) => {
+  const { appState } = useApp();
+  return (
+    <div className="card-elevated overflow-hidden p-0">
+      <div className="relative">
+        <img src={item.image} alt={item.name} loading="lazy" className="w-full h-36 object-cover" onClick={onSelect} className2="cursor-pointer" />
+        <button
+          onClick={e => { e.stopPropagation(); appState.toggleFavorite(item.id); }}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
+        >
+          <Heart className={`w-4 h-4 ${appState.isFavorite(item.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+        </button>
+      </div>
+      <div className="p-3">
+        <p className="font-bold text-foreground text-sm leading-tight line-clamp-2">{item.name}</p>
+        {item.categoryLabel && <p className="text-xs text-muted-foreground mt-1">{item.categoryLabel}</p>}
+        {item.saladCategoryLabel && <p className="text-xs text-muted-foreground mt-1">{item.saladCategoryLabel}</p>}
+        {item.isMainMeal && <span className="text-xs text-primary">⭐ Refeição completa</span>}
+        <CalorieBadge calories={item.calories} />
+      </div>
+    </div>
+  );
+};
+
 const RecipeDetail = ({ recipe, onBack }: { recipe: Recipe; onBack: () => void }) => {
   const { appState } = useApp();
   return (
@@ -125,7 +149,6 @@ const GoalCalculator = ({ onBack }: { onBack: () => void }) => {
     const h = parseFloat(height);
     const a = parseInt(age);
     if (!w || !h || !a) return;
-    // Harris-Benedict BMR
     let bmr = gender === "feminino"
       ? 447.593 + 9.247 * w + 3.098 * h - 4.330 * a
       : 88.362 + 13.397 * w + 4.799 * h - 5.677 * a;
@@ -133,20 +156,13 @@ const GoalCalculator = ({ onBack }: { onBack: () => void }) => {
       sedentario: 1.2, leve: 1.375, moderado: 1.55, ativo: 1.725, "muito ativo": 1.9
     };
     const tdee = bmr * (activityMultipliers[activity] || 1.55);
-    // Deficit for weight loss
     const dailyCal = Math.round(tdee - 500);
     setResult(Math.max(1200, dailyCal));
   };
 
   const saveGoal = () => {
     if (result) {
-      appState.updateProfile({
-        initialWeight: parseFloat(weight),
-        height: parseFloat(height),
-        age: parseInt(age),
-        gender,
-        activityLevel: activity
-      });
+      appState.updateProfile({ initialWeight: parseFloat(weight), height: parseFloat(height), age: parseInt(age), gender, activityLevel: activity });
       appState.setCalorieGoal(result);
       onBack();
     }
@@ -154,14 +170,9 @@ const GoalCalculator = ({ onBack }: { onBack: () => void }) => {
 
   return (
     <div className="screen-content animate-slide-up space-y-4">
-      <button onClick={onBack} className="flex items-center gap-2 text-primary mb-2">
-        <ArrowLeft className="w-4 h-4" /> Voltar
-      </button>
-      <h2 className="text-xl font-heading font-bold text-foreground flex items-center gap-2">
-        <Target className="w-5 h-5 text-primary" /> Definir Meta
-      </h2>
+      <button onClick={onBack} className="flex items-center gap-2 text-primary mb-2"><ArrowLeft className="w-4 h-4" /> Voltar</button>
+      <h2 className="text-xl font-heading font-bold text-foreground flex items-center gap-2"><Target className="w-5 h-5 text-primary" /> Definir Meta</h2>
       <p className="text-sm text-muted-foreground">Calcule suas calorias diárias ideais para atingir seu objetivo.</p>
-
       <div className="space-y-3">
         {[
           { label: "Peso atual (kg)", value: weight, set: setWeightVal },
@@ -174,7 +185,6 @@ const GoalCalculator = ({ onBack }: { onBack: () => void }) => {
             <input type="number" value={f.value} onChange={e => f.set(e.target.value)} className="w-full mt-1 bg-muted rounded-xl px-3 py-2 text-foreground text-sm outline-none" />
           </div>
         ))}
-
         <div className="card-elevated">
           <label className="text-xs text-muted-foreground">Gênero</label>
           <div className="flex gap-2 mt-1">
@@ -185,7 +195,6 @@ const GoalCalculator = ({ onBack }: { onBack: () => void }) => {
             ))}
           </div>
         </div>
-
         <div className="card-elevated">
           <label className="text-xs text-muted-foreground">Nível de atividade</label>
           <div className="grid grid-cols-2 gap-2 mt-1">
@@ -197,19 +206,13 @@ const GoalCalculator = ({ onBack }: { onBack: () => void }) => {
           </div>
         </div>
       </div>
-
-      <button onClick={calculate} className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm">
-        Calcular calorias diárias
-      </button>
-
+      <button onClick={calculate} className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm">Calcular calorias diárias</button>
       {result && (
         <div className="card-highlight text-center">
           <p className="text-xs text-muted-foreground">Meta diária recomendada</p>
           <p className="text-3xl font-bold text-primary mt-1">{result} kcal</p>
           <p className="text-xs text-muted-foreground mt-2">Para perda de peso saudável (~0.5 kg/semana)</p>
-          <button onClick={saveGoal} className="mt-4 w-full py-3 rounded-2xl bg-accent text-accent-foreground font-bold text-sm">
-            Salvar como minha meta
-          </button>
+          <button onClick={saveGoal} className="mt-4 w-full py-3 rounded-2xl bg-accent text-accent-foreground font-bold text-sm">Salvar como minha meta</button>
         </div>
       )}
     </div>
@@ -227,9 +230,7 @@ const PlanningView = ({ onBack }: { onBack: () => void }) => {
     const day = mealPlanDays[selectedDay];
     return (
       <div className="screen-content animate-slide-up">
-        <button onClick={() => setSelectedDay(null)} className="flex items-center gap-2 text-primary mb-4">
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </button>
+        <button onClick={() => setSelectedDay(null)} className="flex items-center gap-2 text-primary mb-4"><ArrowLeft className="w-4 h-4" /> Voltar</button>
         <h2 className="text-xl font-heading font-bold text-foreground mb-4">Dia {day.day}</h2>
         <div className="space-y-3">
           {[
@@ -250,22 +251,15 @@ const PlanningView = ({ onBack }: { onBack: () => void }) => {
 
   return (
     <div className="screen-content animate-slide-up">
-      <button onClick={onBack} className="flex items-center gap-2 text-primary mb-4">
-        <ArrowLeft className="w-4 h-4" /> Voltar
-      </button>
+      <button onClick={onBack} className="flex items-center gap-2 text-primary mb-4"><ArrowLeft className="w-4 h-4" /> Voltar</button>
       <h2 className="text-xl font-heading font-bold text-foreground mb-4">📋 Planejamento de 14 Dias</h2>
-
       <button onClick={() => setShowGoal(true)} className="card-highlight w-full text-left flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Target className="w-5 h-5 text-primary" />
-          <div>
-            <p className="font-bold text-foreground text-sm">Definir Meta</p>
-            <p className="text-xs text-muted-foreground">Calcule suas calorias diárias ideais</p>
-          </div>
+          <div><p className="font-bold text-foreground text-sm">Definir Meta</p><p className="text-xs text-muted-foreground">Calcule suas calorias diárias ideais</p></div>
         </div>
         <ChevronRight className="w-5 h-5 text-primary" />
       </button>
-
       <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
         {(["days", "allowed", "avoid"] as const).map(v => (
           <button key={v} onClick={() => setSubView(v)} className={`filter-chip whitespace-nowrap ${subView === v ? "filter-chip-active" : "filter-chip-inactive"}`}>
@@ -273,24 +267,19 @@ const PlanningView = ({ onBack }: { onBack: () => void }) => {
           </button>
         ))}
       </div>
-
       {subView === "days" && (
         <div className="space-y-2">
           {mealPlanDays.map((d, i) => (
             <button key={d.day} onClick={() => setSelectedDay(i)} className="card-elevated w-full text-left flex items-center justify-between active:scale-[0.98] transition-transform">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm">{d.day}</div>
-                <div>
-                  <p className="font-bold text-foreground text-sm">Dia {d.day}</p>
-                  <p className="text-xs text-muted-foreground truncate max-w-[200px]">Café: {d.breakfast.substring(0, 40)}...</p>
-                </div>
+                <div><p className="font-bold text-foreground text-sm">Dia {d.day}</p><p className="text-xs text-muted-foreground truncate max-w-[200px]">Café: {d.breakfast.substring(0, 40)}...</p></div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           ))}
         </div>
       )}
-
       {subView === "allowed" && (
         <div className="grid grid-cols-2 gap-3">
           {allowedFoods.map(f => (
@@ -302,7 +291,6 @@ const PlanningView = ({ onBack }: { onBack: () => void }) => {
           ))}
         </div>
       )}
-
       {subView === "avoid" && (
         <div className="space-y-2">
           {avoidFoods.map(f => (
@@ -334,8 +322,6 @@ export const MealsScreen = () => {
   };
 
   const filtered = getFiltered();
-
-  // Build unified items for "all" view: marmitas + salads + low carb + desserts
   const allMarmitas = [...marmitaRecipes.breakfast, ...marmitaRecipes.lunch, ...marmitaRecipes.dinner];
 
   return (
@@ -371,6 +357,14 @@ export const MealsScreen = () => {
                       <Lock className="w-6 h-6 text-muted-foreground" />
                     </div>
                   )}
+                  {!d.locked && (
+                    <button
+                      onClick={() => appState.toggleFavorite(d.id)}
+                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                    >
+                      <Heart className={`w-4 h-4 ${appState.isFavorite(d.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                    </button>
+                  )}
                 </div>
                 <div className="p-3">
                   <p className="font-bold text-foreground text-sm leading-tight line-clamp-2">{d.name}</p>
@@ -384,7 +378,15 @@ export const MealsScreen = () => {
         <div className="grid grid-cols-2 gap-3">
           {teas.map(t => (
             <div key={t.id} className="card-elevated overflow-hidden p-0">
-              <img src={t.image} alt={t.name} loading="lazy" className="w-full h-32 object-cover" />
+              <div className="relative">
+                <img src={t.image} alt={t.name} loading="lazy" className="w-full h-32 object-cover" />
+                <button
+                  onClick={() => appState.toggleFavorite(t.id)}
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                >
+                  <Heart className={`w-4 h-4 ${appState.isFavorite(t.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                </button>
+              </div>
               <div className="p-3">
                 <p className="font-bold text-foreground text-sm leading-tight line-clamp-2">{t.name}</p>
                 <p className="text-xs text-muted-foreground mt-1">Chá</p>
@@ -400,7 +402,15 @@ export const MealsScreen = () => {
               <div className="grid grid-cols-2 gap-3">
                 {allMarmitas.slice(0, 4).map(r => (
                   <div key={r.id} className="card-elevated overflow-hidden p-0">
-                    <img src={r.image} alt={r.name} loading="lazy" className="w-full h-32 object-cover" />
+                    <div className="relative">
+                      <img src={r.image} alt={r.name} loading="lazy" className="w-full h-32 object-cover" />
+                      <button
+                        onClick={() => appState.toggleFavorite(r.id)}
+                        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                      >
+                        <Heart className={`w-4 h-4 ${appState.isFavorite(r.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                      </button>
+                    </div>
                     <div className="p-3">
                       <p className="font-bold text-foreground text-sm leading-tight line-clamp-2">{r.name}</p>
                       <CalorieBadge calories={r.calories} />
@@ -413,7 +423,15 @@ export const MealsScreen = () => {
               <div className="grid grid-cols-2 gap-3">
                 {salads.slice(0, 4).map(s => (
                   <div key={s.id} className="card-elevated overflow-hidden p-0">
-                    <img src={s.image} alt={s.name} loading="lazy" className="w-full h-32 object-cover" />
+                    <div className="relative">
+                      <img src={s.image} alt={s.name} loading="lazy" className="w-full h-32 object-cover" />
+                      <button
+                        onClick={() => appState.toggleFavorite(s.id)}
+                        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
+                      >
+                        <Heart className={`w-4 h-4 ${appState.isFavorite(s.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                      </button>
+                    </div>
                     <div className="p-3">
                       <p className="font-bold text-foreground text-sm leading-tight line-clamp-2">{s.name}</p>
                       <p className="text-xs text-muted-foreground">{s.saladCategoryLabel}</p>

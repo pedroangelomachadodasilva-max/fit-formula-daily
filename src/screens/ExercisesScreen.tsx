@@ -140,23 +140,30 @@ export const ExercisesScreen = () => {
         {filtered.map(ex => {
           const isDone = appState.state.dailyLog.exercisesDone.includes(ex.id);
           return (
-            <button key={ex.id} onClick={() => setSelected(ex)} className="card-elevated w-full text-left flex items-center gap-3 active:scale-[0.98] transition-transform">
-              <FoodImage src={ex.image} alt={ex.name} size="md" />
-              <div className="flex-1">
-                <h4 className="font-bold text-foreground text-sm">{ex.name}</h4>
-                <p className="text-xs text-muted-foreground">{ex.levelLabel} • {ex.sets}x{ex.reps}</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {ex.muscles.slice(0, 2).map(m => (
-                    <span key={m} className="text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{m}</span>
-                  ))}
+            <div key={ex.id} className="card-elevated flex items-center gap-3">
+              <button onClick={() => setSelected(ex)} className="flex items-center gap-3 flex-1 text-left active:scale-[0.98] transition-transform">
+                <FoodImage src={ex.image} alt={ex.name} size="md" />
+                <div className="flex-1">
+                  <h4 className="font-bold text-foreground text-sm">{ex.name}</h4>
+                  <p className="text-xs text-muted-foreground">{ex.levelLabel} • {ex.sets}x{ex.reps}</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {ex.muscles.slice(0, 2).map(m => (
+                      <span key={m} className="text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{m}</span>
+                    ))}
+                  </div>
                 </div>
+              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button onClick={() => appState.toggleFavorite(ex.id)} className="w-8 h-8 rounded-full flex items-center justify-center">
+                  <Heart className={`w-4 h-4 ${appState.isFavorite(ex.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                </button>
+                {isDone && (
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                    <Check className="w-3 h-3 text-primary-foreground" />
+                  </div>
+                )}
               </div>
-              {isDone && (
-                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-3 h-3 text-primary-foreground" />
-                </div>
-              )}
-            </button>
+            </div>
           );
         })}
       </div>

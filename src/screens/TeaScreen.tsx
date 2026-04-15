@@ -82,7 +82,7 @@ export const TeaScreen = () => {
   const [selectedTea, setSelectedTea] = useState<Tea | null>(null);
   const [showGuidelines, setShowGuidelines] = useState(false);
   const { appState } = useApp();
-  const { state, markTeaDrunk } = appState;
+  const { state, markTeaDrunk, isFavorite, toggleFavorite } = appState;
 
   if (selectedTea) return <TeaDetail tea={selectedTea} onBack={() => setSelectedTea(null)} />;
 
@@ -135,19 +135,26 @@ export const TeaScreen = () => {
           {teas.map(tea => {
             const isDrunk = state.dailyLog.teasDrunk.includes(tea.id);
             return (
-              <button key={tea.id} onClick={() => setSelectedTea(tea)} className="card-elevated w-full text-left flex items-center gap-4 active:scale-[0.98] transition-transform">
-                <FoodImage src={tea.image} alt={tea.name} size="md" />
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-foreground text-sm">{tea.name}</h4>
-                  <p className="text-xs text-muted-foreground truncate">{tea.shortDescription}</p>
-                  <p className="text-xs text-primary mt-1">⏰ {tea.recommendedTime}</p>
-                </div>
-                {isDrunk && (
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="w-3 h-3 text-primary-foreground" />
+              <div key={tea.id} className="card-elevated flex items-center gap-4">
+                <button onClick={() => setSelectedTea(tea)} className="flex items-center gap-4 flex-1 min-w-0 text-left active:scale-[0.98] transition-transform">
+                  <FoodImage src={tea.image} alt={tea.name} size="md" />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-foreground text-sm">{tea.name}</h4>
+                    <p className="text-xs text-muted-foreground truncate">{tea.shortDescription}</p>
+                    <p className="text-xs text-primary mt-1">⏰ {tea.recommendedTime}</p>
                   </div>
-                )}
-              </button>
+                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button onClick={() => toggleFavorite(tea.id)} className="w-8 h-8 rounded-full flex items-center justify-center">
+                    <Heart className={`w-4 h-4 ${isFavorite(tea.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                  </button>
+                  {isDrunk && (
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="w-3 h-3 text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
