@@ -255,51 +255,7 @@ export const ProfileOverlay = () => {
   );
 };
 
-export const ChatOverlay = () => {
-  const { setShowChat } = useApp();
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: "Olá! 😊 Sou sua assistente do Fórmula Emagrecer. Posso ajudar com dúvidas sobre chás, refeições, exercícios, compulsão alimentar e muito mais. Como posso te ajudar?" }
-  ]);
-  const [input, setInput] = useState("");
-
-  const send = () => {
-    if (!input.trim()) return;
-    setMessages(m => [...m, { role: "user", content: input }]);
-    const q = input.toLowerCase();
-    setInput("");
-    setTimeout(() => {
-      let reply = "Entendi! Posso te ajudar com mais detalhes sobre isso. Que tal verificar as receitas ou o planejamento do app? 💚";
-      if (q.includes("chá")) reply = "Temos 7 chás incríveis! O ideal é consumir até 17h, cerca de 1 litro por dia. Veja na aba Chá! 🍵";
-      if (q.includes("ansiedade") || q.includes("compulsão")) reply = "Respire fundo 🌬️ Inspire por 4s, segure 4s, expire por 6s. Pergunte-se: é fome real ou emocional? Beba água e espere 15 min antes de ceder. Você consegue! 💚";
-      if (q.includes("exercício")) reply = "Temos exercícios para todos os níveis! Comece devagar e aumente gradualmente. Não esqueça do alongamento! 💪";
-      setMessages(m => [...m, { role: "assistant", content: reply }]);
-    }, 800);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 bg-background animate-slide-up">
-      <div className="app-container h-full flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="font-heading font-bold text-foreground text-lg">🤖 Chat IA</h2>
-          <button onClick={() => setShowChat(false)}><X className="w-5 h-5 text-foreground" /></button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm ${m.role === "user" ? "bg-primary text-primary-foreground rounded-br-md" : "bg-muted text-foreground rounded-bl-md"}`}>
-                {m.content}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="p-4 border-t border-border flex gap-2">
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Digite sua mensagem..." className="flex-1 px-4 py-3 rounded-2xl bg-muted text-foreground outline-none text-sm" />
-          <button onClick={send} className="px-4 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm">Enviar</button>
-        </div>
-      </div>
-    </div>
-  );
-};
+// ChatOverlay removed — replaced by ChatWidget component
 
 export const UpsellsOverlay = () => {
   const { setSubScreen, appState } = useApp();
