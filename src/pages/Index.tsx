@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AppProvider, useApp } from "@/contexts/AppContext";
 import { AppHeader } from "@/components/AppHeader";
 import { BottomNav } from "@/components/BottomNav";
@@ -13,34 +13,26 @@ import { SearchOverlay, FavoritesOverlay, ProfileOverlay, UpsellsOverlay, Compul
 import { ChatWidget } from "@/components/ChatWidget";
 import { LoginScreen } from "@/screens/LoginScreen";
 
-const AppContent = () => {
+const AppContent = ({ pendingProfile }: { pendingProfile: any }) => {
   const { activeTab, showSearch, showFavorites, showProfile, showChat, setShowChat, subScreen, appState } = useApp();
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    try { return localStorage.getItem("formula-emagrecer-logged") === "true"; } catch { return false; }
-  });
 
-  const handleLogin = (profileData?: any) => {
-    if (profileData) {
+  // Apply pending profile data once on mount
+  useState(() => {
+    if (pendingProfile) {
       const updates: any = {};
-      if (profileData.name) updates.name = profileData.name;
-      if (profileData.age) updates.age = parseInt(profileData.age);
-      if (profileData.gender) updates.gender = profileData.gender;
-      if (profileData.height) updates.height = parseFloat(profileData.height);
-      if (profileData.weight) updates.initialWeight = parseFloat(profileData.weight);
-      if (profileData.targetWeight) updates.goal = `Chegar a ${profileData.targetWeight}kg`;
-      if (profileData.activityLevel) updates.activityLevel = profileData.activityLevel.toLowerCase();
-      if (profileData.objective) updates.goal = profileData.objective;
+      if (pendingProfile.name) updates.name = pendingProfile.name;
+      if (pendingProfile.age) updates.age = parseInt(pendingProfile.age);
+      if (pendingProfile.gender) updates.gender = pendingProfile.gender;
+      if (pendingProfile.height) updates.height = parseFloat(pendingProfile.height);
+      if (pendingProfile.weight) updates.initialWeight = parseFloat(pendingProfile.weight);
+      if (pendingProfile.targetWeight) updates.goal = `Chegar a ${pendingProfile.targetWeight}kg`;
+      if (pendingProfile.activityLevel) updates.activityLevel = pendingProfile.activityLevel.toLowerCase();
+      if (pendingProfile.objective) updates.goal = pendingProfile.objective;
       if (Object.keys(updates).length > 0) appState.updateProfile(updates);
-      if (profileData.calorieGoal) appState.setCalorieGoal(profileData.calorieGoal);
-      if (profileData.weight) appState.setWeight(parseFloat(profileData.weight));
+      if (pendingProfile.calorieGoal) appState.setCalorieGoal(pendingProfile.calorieGoal);
+      if (pendingProfile.weight) appState.setWeight(parseFloat(pendingProfile.weight));
     }
-    localStorage.setItem("formula-emagrecer-logged", "true");
-    setIsLoggedIn(true);
-  };
-
-  if (!isLoggedIn) {
-    return <LoginScreen onLogin={handleLogin} />;
-  }
+  });
 
   const renderScreen = () => {
     switch (activeTab) {
@@ -74,10 +66,27 @@ const AppContent = () => {
   );
 };
 
-const Index = () => (
-  <AppProvider>
-    <AppContent />
-  </AppProvider>
-);
+const Index = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try { return localStorage.getItem("formula-emagrecer-logged") === "true"; } catch { return false; }
+  });
+  const [pendingProfile, setPendingProfile] = useState<any>(null);
+
+  const handleLogin = (profileData?: any) => {
+    if (profileData) setPendingProfile(profileData);
+    localStorage.setItem("formula-emagrecer-logged", "true");
+    setIsLoggedIn(true);
+  };
+
+  if (!isLoggedIn) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
+  return (
+    <AppProvider>
+      <AppContent pendingProfile={pendingProfile} />
+    </AppProvider>
+  );
+};
 
 export default Index;
