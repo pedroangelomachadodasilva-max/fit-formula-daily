@@ -6,37 +6,49 @@ type ProgressTab = "daily" | "weekly" | "monthly";
 
 const dayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
-const WeeklyBarChart = () => {
-  // Mock weekly data
-  const weekData = [
-    { day: "Seg", score: 60 },
-    { day: "Ter", score: 80 },
-    { day: "Qua", score: 45 },
-    { day: "Qui", score: 90 },
-    { day: "Sex", score: 70 },
-    { day: "Sáb", score: 55 },
-    { day: "Dom", score: 85 },
-  ];
-  const max = Math.max(...weekData.map(d => d.score));
+const WeeklyBarChart = ({ todayScore }: { todayScore: number }) => {
+  // Real weekly data: only today has data (from current state); other days are 0 until the user logs activity.
+  // When persistence is added later, replace this with real per-day history.
+  const todayIdx = new Date().getDay(); // 0=Dom..6=Sáb
+  const order = [1, 2, 3, 4, 5, 6, 0]; // Seg..Dom
+  const weekData = order.map(d => ({
+    day: dayLabels[d],
+    score: d === todayIdx ? todayScore : 0,
+  }));
+  const hasAnyData = weekData.some(d => d.score > 0);
 
   return (
     <div className="card-elevated">
       <h3 className="font-bold text-foreground mb-4">📊 Desempenho da Semana</h3>
       <div className="flex items-end gap-2 h-40">
         {weekData.map((d) => {
-          const height = (d.score / max) * 100;
+          const height = d.score; // 0..100 used directly as % of container
           const isGood = d.score >= 70;
           return (
-            <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-xs font-semibold text-foreground">{d.score}%</span>
-              <div className="w-full rounded-t-lg relative" style={{ height: `${height}%` }}>
-                <div className={`w-full h-full rounded-t-lg ${isGood ? "bg-gradient-to-t from-primary to-primary-light" : "bg-gradient-to-t from-muted-foreground/30 to-muted-foreground/20"}`} />
+            <div key={d.day} className="flex-1 flex flex-col items-center gap-1 h-full">
+              <span className={`text-xs font-semibold ${d.score > 0 ? "text-foreground" : "text-muted-foreground/50"}`}>{d.score}%</span>
+              <div className="w-full flex-1 flex items-end">
+                <div
+                  className={`w-full rounded-t-lg transition-all ${
+                    d.score === 0
+                      ? "bg-muted/40"
+                      : isGood
+                        ? "bg-gradient-to-t from-primary to-primary-light"
+                        : "bg-gradient-to-t from-accent/60 to-accent/40"
+                  }`}
+                  style={{ height: d.score === 0 ? "4px" : `${height}%` }}
+                />
               </div>
               <span className="text-xs text-muted-foreground font-medium">{d.day}</span>
             </div>
           );
         })}
       </div>
+      {!hasAnyData && (
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          Marque suas atividades durante a semana para ver seu desempenho aqui.
+        </p>
+      )}
     </div>
   );
 };
@@ -136,7 +148,7 @@ export const ProgressScreen = () => {
         ))}
       </div>
 
-      {tab === "weekly" && <WeeklyBarChart />}
+      {tab === "weekly" && <WeeklyBarChart todayScore={adherence} />}
 
       {/* Weight chart */}
       <div className="card-elevated">
