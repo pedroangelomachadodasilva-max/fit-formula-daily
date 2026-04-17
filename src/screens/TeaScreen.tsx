@@ -96,18 +96,37 @@ export const TeaScreen = () => {
         <p className="text-sm opacity-90 mt-1">7 chás poderosos para acelerar seu emagrecimento</p>
       </div>
 
-      <div className="card-highlight">
-        <p className="text-xs font-medium text-primary uppercase tracking-wider">Chá do dia</p>
-        <div className="flex items-center justify-between mt-2">
-          <div>
-            <h3 className="font-bold text-foreground">{teas[new Date().getDay() % teas.length].name}</h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              {state.dailyLog.teasDrunk.length} chá(s) tomado(s) hoje
-            </p>
-          </div>
-          <FoodImage src={teas[new Date().getDay() % teas.length].image} alt="Chá do dia" size="md" />
-        </div>
-      </div>
+      {(() => {
+        const teaOfDay = teas[new Date().getDay() % teas.length];
+        const drunkOfDay = state.dailyLog.teasDrunk.filter(id => id === teaOfDay.id).length;
+        return (
+          <button
+            onClick={() => setSelectedTea(teaOfDay)}
+            className="card-highlight w-full text-left active:scale-[0.99] transition-transform"
+          >
+            <p className="text-xs font-medium text-primary uppercase tracking-wider">Chá do dia · toque para ver receita</p>
+            <div className="flex items-center justify-between mt-2 gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-foreground truncate">{teaOfDay.name}</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {state.dailyLog.teasDrunk.length} chá(s) tomado(s) hoje
+                  {drunkOfDay > 0 && ` · ${drunkOfDay}x deste`}
+                </p>
+              </div>
+              <FoodImage src={teaOfDay.image} alt="Chá do dia" size="md" />
+            </div>
+            <div className="flex gap-2 mt-3">
+              <span
+                onClick={(e) => { e.stopPropagation(); markTeaDrunk(teaOfDay.id); }}
+                className="flex-1 text-center text-xs font-bold py-2 rounded-xl bg-primary text-primary-foreground cursor-pointer"
+              >
+                <Check className="w-3 h-3 inline mr-1" />
+                Marcar tomado
+              </span>
+            </div>
+          </button>
+        );
+      })()}
 
       <button onClick={() => setShowGuidelines(!showGuidelines)} className="card-elevated w-full text-left">
         <div className="flex items-center gap-2">
@@ -134,28 +153,40 @@ export const TeaScreen = () => {
 
       <div>
         <h3 className="section-title mb-3">Os 7 Chás</h3>
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
           {teas.map(tea => {
-            const isDrunk = state.dailyLog.teasDrunk.includes(tea.id);
+            const drunkCount = state.dailyLog.teasDrunk.filter(id => id === tea.id).length;
+            const isDrunk = drunkCount > 0;
             return (
-              <div key={tea.id} className="card-elevated flex items-center gap-4">
-                <button onClick={() => setSelectedTea(tea)} className="flex items-center gap-4 flex-1 min-w-0 text-left active:scale-[0.98] transition-transform">
-                  <FoodImage src={tea.image} alt={tea.name} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-foreground text-sm">{tea.name}</h4>
-                    <p className="text-xs text-muted-foreground truncate">{tea.shortDescription}</p>
-                    <p className="text-xs text-primary mt-1">⏰ {tea.recommendedTime}</p>
-                  </div>
-                </button>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => toggleFavorite(tea.id)} className="w-8 h-8 rounded-full flex items-center justify-center">
-                    <Heart className={`w-4 h-4 ${isFavorite(tea.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
-                  </button>
+              <div key={tea.id} className="card-elevated p-2 flex flex-col">
+                <button
+                  onClick={() => setSelectedTea(tea)}
+                  className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted active:scale-[0.98] transition-transform"
+                >
+                  <img src={tea.image} alt={tea.name} loading="lazy" className="w-full h-full object-cover" />
                   {isDrunk && (
-                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                    <div className="absolute top-2 right-2 min-w-6 h-6 px-1.5 rounded-full bg-primary flex items-center justify-center shadow-md">
                       <Check className="w-3 h-3 text-primary-foreground" />
+                      {drunkCount > 1 && <span className="text-[10px] font-bold text-primary-foreground ml-0.5">{drunkCount}</span>}
                     </div>
                   )}
+                </button>
+                <div className="px-1 pt-2 pb-1 flex-1 flex flex-col">
+                  <h4 className="font-bold text-foreground text-sm leading-tight line-clamp-2">{tea.name}</h4>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tea.shortDescription}</p>
+                  <p className="text-xs text-primary mt-1">⏰ {tea.recommendedTime}</p>
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
+                    <button
+                      onClick={() => markTeaDrunk(tea.id)}
+                      className="text-xs font-bold text-primary flex items-center gap-1"
+                    >
+                      <Check className="w-3 h-3" />
+                      {isDrunk ? `${drunkCount}x` : "Tomar"}
+                    </button>
+                    <button onClick={() => toggleFavorite(tea.id)} className="w-7 h-7 rounded-full flex items-center justify-center">
+                      <Heart className={`w-4 h-4 ${isFavorite(tea.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
