@@ -125,13 +125,12 @@ export function useAppState() {
   }, []);
 
   const markTeaDrunk = useCallback((teaId: string) => {
+    // Allow registering multiple cups of the same tea
     setState(s => ({
       ...s,
       dailyLog: {
         ...s.dailyLog,
-        teasDrunk: s.dailyLog.teasDrunk.includes(teaId)
-          ? s.dailyLog.teasDrunk
-          : [...s.dailyLog.teasDrunk, teaId],
+        teasDrunk: [...s.dailyLog.teasDrunk, teaId],
         habits: { ...s.dailyLog.habits, tea: true }
       }
     }));
