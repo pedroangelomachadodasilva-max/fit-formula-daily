@@ -148,7 +148,7 @@ export const ProgressScreen = () => {
         ))}
       </div>
 
-      {tab === "weekly" && <WeeklyBarChart />}
+      {tab === "weekly" && <WeeklyBarChart todayScore={adherence} />}
 
       {/* Weight chart */}
       <div className="card-elevated">
