@@ -65,7 +65,10 @@ const TeaDetail = ({ tea, onBack }: { tea: Tea; onBack: () => void }) => {
             isDrunk ? "bg-primary text-primary-foreground" : "bg-primary/20 text-primary"
           }`}
         >
-          <Check className="w-4 h-4" /> {isDrunk ? "Tomado!" : "Marcar como tomado"}
+          <Check className="w-4 h-4" />
+          {isDrunk
+            ? `Tomado ${state.dailyLog.teasDrunk.filter(id => id === tea.id).length}x — tocar para +1`
+            : "Marcar como tomado"}
         </button>
         <button
           onClick={() => toggleFavorite(tea.id)}
