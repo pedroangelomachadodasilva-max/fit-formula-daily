@@ -414,11 +414,15 @@ export const MealsScreen = () => {
               <h3 className="section-title">🥡 Marmitas Fit</h3>
               <div className="grid grid-cols-2 gap-3">
                 {allMarmitas.slice(0, 4).map(r => (
-                  <div key={r.id} className="card-elevated overflow-hidden p-0">
+                  <button
+                    key={r.id}
+                    onClick={() => setSelectedRecipe(marmitaToRecipe(r))}
+                    className="card-elevated overflow-hidden p-0 text-left active:scale-[0.98] transition-transform"
+                  >
                     <div className="relative">
                       <img src={r.image} alt={r.name} loading="lazy" className="w-full h-32 object-cover" />
                       <button
-                        onClick={() => appState.toggleFavorite(r.id)}
+                        onClick={e => { e.stopPropagation(); appState.toggleFavorite(r.id); }}
                         className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
                       >
                         <Heart className={`w-4 h-4 ${appState.isFavorite(r.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
@@ -428,18 +432,22 @@ export const MealsScreen = () => {
                       <p className="font-bold text-foreground text-sm leading-tight line-clamp-2">{r.name}</p>
                       <CalorieBadge calories={r.calories} />
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
 
               <h3 className="section-title">🥗 Saladas</h3>
               <div className="grid grid-cols-2 gap-3">
                 {salads.slice(0, 4).map(s => (
-                  <div key={s.id} className="card-elevated overflow-hidden p-0">
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedRecipe(s)}
+                    className="card-elevated overflow-hidden p-0 text-left active:scale-[0.98] transition-transform"
+                  >
                     <div className="relative">
                       <img src={s.image} alt={s.name} loading="lazy" className="w-full h-32 object-cover" />
                       <button
-                        onClick={() => appState.toggleFavorite(s.id)}
+                        onClick={e => { e.stopPropagation(); appState.toggleFavorite(s.id); }}
                         className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center"
                       >
                         <Heart className={`w-4 h-4 ${appState.isFavorite(s.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
@@ -450,7 +458,7 @@ export const MealsScreen = () => {
                       <p className="text-xs text-muted-foreground">{s.saladCategoryLabel}</p>
                       {s.isMainMeal && <span className="text-xs text-primary">⭐ Refeição completa</span>}
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </>
