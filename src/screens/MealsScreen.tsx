@@ -305,6 +305,19 @@ const PlanningView = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
+const marmitaToRecipe = (m: { id: string; name: string; ingredients: string[]; preparation: string; image: string; calories?: number }): Recipe => ({
+  id: m.id,
+  name: m.name,
+  category: "lunch",
+  categoryLabel: "Marmita Fit",
+  ingredients: m.ingredients,
+  preparation: m.preparation,
+  time: "30 min",
+  servings: "1 porção",
+  image: m.image,
+  calories: m.calories,
+});
+
 export const MealsScreen = () => {
   const { subScreen, setSubScreen, appState } = useApp();
   const [filter, setFilter] = useState<MealFilter>("all");
