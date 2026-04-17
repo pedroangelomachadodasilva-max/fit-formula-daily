@@ -1,5 +1,15 @@
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Ruler, Weight, Target, ChevronRight, ChevronLeft, Sparkles, Check, Droplets } from "lucide-react";
+import imgObjetivo from "@/assets/onboarding/objetivo.jpg";
+import imgAtividade from "@/assets/onboarding/atividade.jpg";
+import imgAlimentacao from "@/assets/onboarding/alimentacao.jpg";
+import imgHorario from "@/assets/onboarding/horario.jpg";
+import imgDificuldade from "@/assets/onboarding/dificuldade.jpg";
+import imgEmocional from "@/assets/onboarding/emocional.jpg";
+import imgCorpo from "@/assets/onboarding/corpo.jpg";
+import imgDesejos from "@/assets/onboarding/desejos.jpg";
+import imgMelhorar from "@/assets/onboarding/melhorar.jpg";
+import imgDados from "@/assets/onboarding/dados.jpg";
 
 interface OnboardingData {
   name: string;
@@ -26,18 +36,18 @@ const defaultOnboarding: OnboardingData = {
   hardestTime: "", difficulties: [], situations: [], bodyFeeling: "", cravings: [], firstImprovement: []
 };
 
-const SelectableCard = ({ label, selected, onClick, multi }: { label: string; selected: boolean; onClick: () => void; multi?: boolean }) => (
+const SelectableCard = ({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) => (
   <button
     onClick={onClick}
-    className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-medium transition-all border-2 ${
+    className={`w-full text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all border-2 ${
       selected
-        ? "bg-primary/10 border-primary text-primary"
+        ? "bg-primary/10 border-primary text-primary shadow-sm"
         : "bg-card border-border text-foreground hover:border-primary/30"
     }`}
   >
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-2">
       <span>{label}</span>
-      {selected && <Check className="w-4 h-4 text-primary" />}
+      {selected && <Check className="w-4 h-4 text-primary shrink-0" />}
     </div>
   </button>
 );
@@ -45,6 +55,43 @@ const SelectableCard = ({ label, selected, onClick, multi }: { label: string; se
 interface LoginScreenProps {
   onLogin: (profileData?: Partial<OnboardingData> & { calorieGoal?: number }) => void;
 }
+
+// Question definitions for the wizard
+type QuestionType = "single" | "multi";
+interface QuizQuestion {
+  key: keyof OnboardingData;
+  type: QuestionType;
+  title: string;
+  subtitle?: string;
+  image: string;
+  options: string[];
+}
+
+const quizQuestions: QuizQuestion[] = [
+  { key: "objective", type: "single", title: "Qual é seu objetivo principal?", subtitle: "Vamos personalizar tudo para você", image: imgObjetivo,
+    options: ["Emagrecer", "Reduzir medidas", "Criar rotina saudável", "Melhorar alimentação", "Controlar ansiedade alimentar"] },
+  { key: "activityLevel", type: "single", title: "Qual seu nível de atividade física?", image: imgAtividade,
+    options: ["Sedentária(o)", "Leve", "Moderada(o)", "Ativa(o)", "Muito ativa(o)"] },
+  { key: "exerciseFrequency", type: "single", title: "Você pratica exercício hoje?", image: imgAtividade,
+    options: ["Não pratico", "1 a 2 vezes por semana", "3 a 4 vezes por semana", "5 ou mais vezes por semana"] },
+  { key: "dietOrganization", type: "single", title: "Como é sua rotina alimentar hoje?", image: imgAlimentacao,
+    options: ["Muito desorganizada", "Mais ou menos", "Já tento me cuidar", "Bem organizada"] },
+  { key: "hardestTime", type: "single", title: "Qual horário você mais sente dificuldade?", image: imgHorario,
+    options: ["Manhã", "Tarde", "Noite", "Madrugada", "O dia todo varia"] },
+  { key: "difficulties", type: "multi", title: "O que mais representa sua dificuldade hoje?", subtitle: "Pode escolher mais de uma", image: imgDificuldade,
+    options: ["Emagreço, mas engordo tudo de novo", "Tenho fome fora do horário", "Como por ansiedade", "Tenho dificuldade em manter rotina", "Não consigo controlar doces", "Sinto muito inchaço", "Me sinto sem energia"] },
+  { key: "situations", type: "multi", title: "Qual situação mais te atrapalha?", subtitle: "Pode escolher mais de uma", image: imgEmocional,
+    options: ["Falta de tempo", "Ansiedade", "Compulsão", "Cansaço", "Falta de motivação", "Ambiente familiar", "Final de semana"] },
+  { key: "bodyFeeling", type: "single", title: "Como você se sente em relação ao seu corpo hoje?", image: imgCorpo,
+    options: ["Insatisfeita(o)", "Desmotivada(o)", "Cansada(o) de tentar", "Quero mudar de verdade", "Estou começando a me cuidar"] },
+  { key: "cravings", type: "multi", title: "Sente vontade frequente de comer:", subtitle: "Pode escolher mais de uma", image: imgDesejos,
+    options: ["Doces", "Massas", "Lanches rápidos", "Beliscar toda hora", "Como mais no emocional"] },
+  { key: "firstImprovement", type: "multi", title: "O que você mais quer melhorar primeiro?", subtitle: "Pode escolher mais de uma", image: imgMelhorar,
+    options: ["Perder peso", "Reduzir barriga/inchaço", "Comer melhor", "Controlar ansiedade", "Criar constância", "Beber mais água"] },
+];
+
+// Steps: 0 = intro, 1 = basic data, 2..(2+quiz) = quiz questions, last = summary
+const QUIZ_START = 2;
 
 export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
   const [view, setView] = useState<"login" | "signup" | "onboarding" | "forgot">("login");
@@ -59,7 +106,8 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
   const [data, setData] = useState<OnboardingData>(defaultOnboarding);
   const [error, setError] = useState("");
 
-  const totalSteps = 5;
+  const totalSteps = QUIZ_START + quizQuestions.length + 1; // intro + data + quiz + summary
+  const summaryStep = totalSteps - 1;
 
   const toggleMulti = (field: keyof OnboardingData, value: string) => {
     setData(d => {
@@ -73,7 +121,7 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
     const h = parseFloat(data.height) || 165;
     const a = parseInt(data.age) || 30;
     const isFemale = data.gender !== "masculino";
-    let bmr = isFemale
+    const bmr = isFemale
       ? 447.593 + 9.247 * w + 3.098 * h - 4.330 * a
       : 88.362 + 13.397 * w + 4.799 * h - 5.677 * a;
     const multipliers: Record<string, number> = {
@@ -88,7 +136,7 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
     const h = parseFloat(data.height) || 165;
     const a = parseInt(data.age) || 30;
     const isFemale = data.gender !== "masculino";
-    let bmr = isFemale
+    const bmr = isFemale
       ? 447.593 + 9.247 * w + 3.098 * h - 4.330 * a
       : 88.362 + 13.397 * w + 4.799 * h - 5.677 * a;
     const multipliers: Record<string, number> = {
@@ -122,19 +170,32 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
     const calorieGoal = calculateCalories();
     localStorage.setItem("formula-emagrecer-onboarded", "true");
     localStorage.setItem("formula-emagrecer-onboarding", JSON.stringify(data));
-    onLogin({
-      ...data,
-      calorieGoal
-    });
+    onLogin({ ...data, calorieGoal });
+  };
+
+  // Validation: can advance from current step?
+  const canAdvance = (): boolean => {
+    if (onboardingStep === 0) return true;
+    if (onboardingStep === 1) {
+      return !!(data.name && data.age && data.height && data.weight && data.gender);
+    }
+    if (onboardingStep >= QUIZ_START && onboardingStep < QUIZ_START + quizQuestions.length) {
+      const q = quizQuestions[onboardingStep - QUIZ_START];
+      const v = data[q.key];
+      return q.type === "multi" ? (v as string[]).length > 0 : !!v;
+    }
+    return true;
   };
 
   const nextStep = () => {
-    if (onboardingStep < totalSteps - 1) setOnboardingStep(s => s + 1);
+    if (!canAdvance()) { setError("Selecione uma opção para continuar"); return; }
+    setError("");
+    if (onboardingStep < summaryStep) setOnboardingStep(s => s + 1);
     else finishOnboarding();
   };
-  const prevStep = () => { if (onboardingStep > 0) setOnboardingStep(s => s - 1); };
+  const prevStep = () => { setError(""); if (onboardingStep > 0) setOnboardingStep(s => s - 1); };
 
-  // LOGIN VIEW
+  // ============ LOGIN ============
   if (view === "login") {
     return (
       <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex items-center justify-center px-4">
@@ -187,7 +248,7 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
     );
   }
 
-  // SIGNUP VIEW
+  // ============ SIGNUP ============
   if (view === "signup") {
     return (
       <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex items-center justify-center px-4">
@@ -236,7 +297,7 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
     );
   }
 
-  // FORGOT PASSWORD
+  // ============ FORGOT PASSWORD ============
   if (view === "forgot") {
     return (
       <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex items-center justify-center px-4">
@@ -262,7 +323,7 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
     );
   }
 
-  // ONBOARDING
+  // ============ ONBOARDING ============
   const progressPct = ((onboardingStep + 1) / totalSteps) * 100;
 
   const renderOnboardingStep = () => {
@@ -275,7 +336,7 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
           </div>
           <h2 className="text-2xl font-heading font-bold text-foreground">Vamos personalizar sua jornada</h2>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-            Responda algumas perguntas para que o app monte metas e acompanhamento de forma mais inteligente para você.
+            Responda algumas perguntas rápidas, uma por vez, para que o app monte metas e acompanhamento sob medida para você.
           </p>
           <button onClick={nextStep} className="w-full max-w-xs py-3.5 rounded-2xl bg-primary text-primary-foreground font-bold text-sm shadow-md">
             Começar
@@ -284,141 +345,97 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
       );
     }
 
-    // Step 1: Basic data
+    // Step 1: Basic data card
     if (onboardingStep === 1) {
       return (
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 animate-fade-in">
-          <h2 className="text-xl font-heading font-bold text-foreground">Dados Básicos</h2>
-          <p className="text-sm text-muted-foreground">Precisamos conhecer você melhor</p>
-          {[
-            { label: "Nome completo", value: data.name, key: "name", type: "text", placeholder: "Seu nome", icon: User },
-            { label: "Idade", value: data.age, key: "age", type: "number", placeholder: "Ex: 32", icon: User },
-            { label: "Altura (cm)", value: data.height, key: "height", type: "number", placeholder: "Ex: 165", icon: Ruler },
-            { label: "Peso atual (kg)", value: data.weight, key: "weight", type: "number", placeholder: "Ex: 75", icon: Weight },
-            { label: "Peso desejado (kg)", value: data.targetWeight, key: "targetWeight", type: "number", placeholder: "Ex: 65", icon: Target },
-          ].map(f => (
-            <div key={f.key}>
-              <label className="text-xs text-muted-foreground mb-1 block">{f.label}</label>
-              <div className="flex items-center gap-2 bg-muted rounded-2xl px-4">
-                <f.icon className="w-4 h-4 text-muted-foreground" />
-                <input
-                  type={f.type} value={f.value}
-                  onChange={e => setData(d => ({ ...d, [f.key]: e.target.value }))}
-                  placeholder={f.placeholder}
-                  className="flex-1 bg-transparent py-3 text-sm text-foreground outline-none"
-                />
+        <div className="flex-1 overflow-y-auto px-4 py-4 animate-fade-in">
+          <div className="card-elevated p-5 space-y-4">
+            <div className="flex flex-col items-center text-center space-y-2">
+              <img src={imgDados} alt="Dados básicos" className="w-32 h-32 rounded-2xl object-cover" />
+              <h2 className="text-lg font-heading font-bold text-foreground">Conta um pouco sobre você</h2>
+              <p className="text-xs text-muted-foreground">Esses dados ajudam a calcular suas metas</p>
+            </div>
+            {[
+              { label: "Nome completo", value: data.name, key: "name", type: "text", placeholder: "Seu nome", icon: User },
+              { label: "Idade", value: data.age, key: "age", type: "number", placeholder: "Ex: 32", icon: User },
+              { label: "Altura (cm)", value: data.height, key: "height", type: "number", placeholder: "Ex: 165", icon: Ruler },
+              { label: "Peso atual (kg)", value: data.weight, key: "weight", type: "number", placeholder: "Ex: 75", icon: Weight },
+              { label: "Peso desejado (kg)", value: data.targetWeight, key: "targetWeight", type: "number", placeholder: "Ex: 65", icon: Target },
+            ].map(f => (
+              <div key={f.key}>
+                <label className="text-xs text-muted-foreground mb-1 block">{f.label}</label>
+                <div className="flex items-center gap-2 bg-muted rounded-2xl px-4">
+                  <f.icon className="w-4 h-4 text-muted-foreground" />
+                  <input
+                    type={f.type} value={f.value}
+                    onChange={e => setData(d => ({ ...d, [f.key]: e.target.value }))}
+                    placeholder={f.placeholder}
+                    className="flex-1 bg-transparent py-3 text-sm text-foreground outline-none"
+                  />
+                </div>
+              </div>
+            ))}
+            <div>
+              <label className="text-xs text-muted-foreground mb-2 block">Gênero</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: "Feminino", val: "feminino" },
+                  { label: "Masculino", val: "masculino" },
+                  { label: "Não informar", val: "nao-informar" }
+                ].map(g => (
+                  <SelectableCard key={g.val} label={g.label} selected={data.gender === g.val} onClick={() => setData(d => ({ ...d, gender: g.val }))} />
+                ))}
               </div>
             </div>
-          ))}
-          <div>
-            <label className="text-xs text-muted-foreground mb-2 block">Gênero</label>
-            <div className="grid grid-cols-3 gap-2">
-              {["Feminino", "Masculino", "Prefiro não informar"].map(g => (
-                <SelectableCard key={g} label={g} selected={data.gender === g.toLowerCase()} onClick={() => setData(d => ({ ...d, gender: g.toLowerCase() }))} />
-              ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Quiz steps (one question per card)
+    if (onboardingStep >= QUIZ_START && onboardingStep < QUIZ_START + quizQuestions.length) {
+      const q = quizQuestions[onboardingStep - QUIZ_START];
+      const value = data[q.key];
+      const qNumber = onboardingStep - QUIZ_START + 1;
+      return (
+        <div className="flex-1 overflow-y-auto px-4 py-4 animate-fade-in" key={q.key}>
+          <div className="card-elevated p-5 space-y-4">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <img src={q.image} alt="" className="w-32 h-32 rounded-2xl object-cover shadow-sm" />
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-primary uppercase tracking-wider">Pergunta {qNumber} de {quizQuestions.length}</p>
+                <h2 className="text-lg font-heading font-bold text-foreground leading-tight">{q.title}</h2>
+                {q.subtitle && <p className="text-xs text-muted-foreground">{q.subtitle}</p>}
+              </div>
+            </div>
+            <div className="space-y-2 pt-1">
+              {q.options.map(o => {
+                const selected = q.type === "multi"
+                  ? (value as string[]).includes(o)
+                  : value === o;
+                return (
+                  <SelectableCard
+                    key={o}
+                    label={o}
+                    selected={selected}
+                    onClick={() => q.type === "multi" ? toggleMulti(q.key, o) : setData(d => ({ ...d, [q.key]: o }))}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
       );
     }
 
-    // Step 2: Objective & routine
-    if (onboardingStep === 2) {
-      return (
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5 animate-fade-in">
-          <h2 className="text-xl font-heading font-bold text-foreground">Objetivo e Rotina</h2>
-          
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Qual é seu objetivo principal?</p>
-            {["Emagrecer", "Reduzir medidas", "Criar rotina saudável", "Melhorar alimentação", "Controlar ansiedade alimentar"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.objective === o} onClick={() => setData(d => ({ ...d, objective: o }))} />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Nível de atividade física?</p>
-            {["Sedentária(o)", "Leve", "Moderada(o)", "Ativa(o)", "Muito ativa(o)"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.activityLevel === o} onClick={() => setData(d => ({ ...d, activityLevel: o }))} />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Pratica exercício hoje?</p>
-            {["Não pratico", "1 a 2 vezes por semana", "3 a 4 vezes por semana", "5 ou mais vezes por semana"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.exerciseFrequency === o} onClick={() => setData(d => ({ ...d, exerciseFrequency: o }))} />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Como é sua rotina alimentar hoje?</p>
-            {["Muito desorganizada", "Mais ou menos", "Já tento me cuidar", "Bem organizada"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.dietOrganization === o} onClick={() => setData(d => ({ ...d, dietOrganization: o }))} />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Horário de maior dificuldade?</p>
-            {["Manhã", "Tarde", "Noite", "Madrugada", "O dia todo varia"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.hardestTime === o} onClick={() => setData(d => ({ ...d, hardestTime: o }))} />
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Step 3: Pains & difficulties
-    if (onboardingStep === 3) {
-      return (
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5 animate-fade-in">
-          <h2 className="text-xl font-heading font-bold text-foreground">Suas Dificuldades</h2>
-          <p className="text-sm text-muted-foreground">Queremos entender o que você sente. Tudo bem, estamos juntos nisso. 💚</p>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">O que mais representa sua dificuldade?</p>
-            {["Emagreço, mas engordo tudo de novo", "Tenho fome fora do horário", "Como por ansiedade", "Tenho dificuldade em manter rotina", "Não consigo controlar doces", "Sinto muito inchaço", "Me sinto sem energia"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.difficulties.includes(o)} onClick={() => toggleMulti("difficulties", o)} multi />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Qual situação mais te atrapalha?</p>
-            {["Falta de tempo", "Ansiedade", "Compulsão", "Cansaço", "Falta de motivação", "Ambiente familiar", "Final de semana"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.situations.includes(o)} onClick={() => toggleMulti("situations", o)} multi />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Como se sente em relação ao seu corpo?</p>
-            {["Insatisfeita(o)", "Desmotivada(o)", "Cansada(o) de tentar", "Quero mudar de verdade", "Estou começando a me cuidar"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.bodyFeeling === o} onClick={() => setData(d => ({ ...d, bodyFeeling: o }))} />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Sente vontade frequente de comer:</p>
-            {["Doces", "Massas", "Lanches rápidos", "Beliscar toda hora", "Como mais no emocional"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.cravings.includes(o)} onClick={() => toggleMulti("cravings", o)} multi />
-            ))}
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">O que quer melhorar primeiro?</p>
-            {["Perder peso", "Reduzir barriga/inchaço", "Comer melhor", "Controlar ansiedade", "Criar constância", "Beber mais água"].map(o => (
-              <SelectableCard key={o} label={o} selected={data.firstImprovement.includes(o)} onClick={() => toggleMulti("firstImprovement", o)} multi />
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Step 4: Summary + calorie calculation + conclusion
-    if (onboardingStep === 4) {
+    // Summary step
+    if (onboardingStep === summaryStep) {
       const calGoal = calculateCalories();
       const maint = maintenanceCalories();
       const waterGoal = Math.round((parseFloat(data.weight) || 70) * 35);
 
       return (
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5 animate-fade-in">
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 animate-fade-in">
           <div className="text-center space-y-2">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
               <Sparkles className="w-8 h-8 text-primary" />
@@ -486,9 +503,9 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
             </div>
           </div>
 
-          <div className="text-center space-y-3 pt-4">
+          <div className="text-center space-y-2 pt-2">
             <h3 className="text-lg font-heading font-bold text-foreground">🎉 Tudo pronto!</h3>
-            <p className="text-sm text-muted-foreground">Sua experiência foi personalizada. O app já preparou seu plano inicial.</p>
+            <p className="text-sm text-muted-foreground">Sua experiência foi personalizada. Vamos começar.</p>
           </div>
         </div>
       );
@@ -503,10 +520,10 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
       {onboardingStep > 0 && (
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center justify-between mb-2">
-            <button onClick={prevStep} className="p-2 -ml-2">
+            <button onClick={prevStep} className="p-2 -ml-2 active:scale-95 transition-transform">
               <ChevronLeft className="w-5 h-5 text-foreground" />
             </button>
-            <span className="text-xs text-muted-foreground">Etapa {onboardingStep} de {totalSteps - 1}</span>
+            <span className="text-xs text-muted-foreground font-medium">Etapa {onboardingStep + 1} de {totalSteps}</span>
             <div className="w-9" />
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -517,11 +534,32 @@ export const LoginScreen = ({ onLogin }: LoginScreenProps) => {
 
       {renderOnboardingStep()}
 
-      {/* Bottom nav for onboarding steps 1-4 */}
+      {error && onboardingStep > 0 && (
+        <div className="px-4">
+          <p className="text-xs text-red-500 text-center bg-red-50 py-2 rounded-xl">{error}</p>
+        </div>
+      )}
+
+      {/* Bottom nav */}
       {onboardingStep >= 1 && (
-        <div className="p-4 border-t border-border">
-          <button onClick={nextStep} className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground font-bold text-sm shadow-md flex items-center justify-center gap-2">
-            {onboardingStep === totalSteps - 1 ? "Entrar no meu plano" : "Continuar"}
+        <div className="p-4 border-t border-border bg-background flex gap-3">
+          <button
+            onClick={prevStep}
+            className="px-5 py-3.5 rounded-2xl bg-muted text-foreground font-bold text-sm flex items-center justify-center gap-1 active:scale-[0.98] transition-transform"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Voltar
+          </button>
+          <button
+            onClick={nextStep}
+            disabled={!canAdvance()}
+            className={`flex-1 py-3.5 rounded-2xl font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all ${
+              canAdvance()
+                ? "bg-primary text-primary-foreground active:scale-[0.98]"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
+            }`}
+          >
+            {onboardingStep === summaryStep ? "Entrar no meu plano" : "Continuar"}
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
