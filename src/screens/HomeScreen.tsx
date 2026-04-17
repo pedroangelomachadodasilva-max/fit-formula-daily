@@ -80,14 +80,37 @@ export const HomeScreen = () => {
         </div>
         {showWeightInput ? (
           <div className="flex gap-2 mt-3">
-            <input type="number" value={weightInput} onChange={e => setWeightInput(e.target.value)} placeholder="Ex: 73.5" className="flex-1 px-3 py-2 rounded-xl bg-muted text-foreground text-sm border-0 outline-none" />
-            <button onClick={() => { if (weightInput) { setWeight(parseFloat(weightInput)); setShowWeightInput(false); setWeightInput(""); } }} className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={weightInput}
+              onChange={e => setWeightInput(e.target.value)}
+              placeholder="Ex: 73,5"
+              className="flex-1 px-3 py-2 rounded-xl bg-muted text-foreground text-sm border-0 outline-none"
+            />
+            <button
+              onClick={() => {
+                const parsed = parseFloat(weightInput.replace(",", ".").trim());
+                if (!isNaN(parsed) && parsed > 0) {
+                  setWeight(parsed);
+                  setShowWeightInput(false);
+                  setWeightInput("");
+                }
+              }}
+              className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
+            >
               Salvar
+            </button>
+            <button
+              onClick={() => { setShowWeightInput(false); setWeightInput(""); }}
+              className="px-3 py-2 rounded-xl bg-muted text-foreground text-sm font-medium"
+            >
+              Cancelar
             </button>
           </div>
         ) : (
           <button onClick={() => setShowWeightInput(true)} className="mt-3 w-full text-sm font-medium py-2 rounded-xl bg-accent/10 text-accent">
-            Registrar peso
+            {state.dailyLog.weight ? "Atualizar peso" : "Registrar peso"}
           </button>
         )}
       </div>
