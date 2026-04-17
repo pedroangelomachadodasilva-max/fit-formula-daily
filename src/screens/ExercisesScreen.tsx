@@ -136,32 +136,44 @@ export const ExercisesScreen = () => {
         ))}
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
         {filtered.map(ex => {
           const isDone = appState.state.dailyLog.exercisesDone.includes(ex.id);
+          const muscleEmojis: Record<string, string> = { legs: "🦵", abs: "🎯", arms: "💪", full: "🏃" };
           return (
-            <div key={ex.id} className="card-elevated flex items-center gap-3">
-              <button onClick={() => setSelected(ex)} className="flex items-center gap-3 flex-1 text-left active:scale-[0.98] transition-transform">
-                <FoodImage src={ex.image} alt={ex.name} size="md" />
-                <div className="flex-1">
-                  <h4 className="font-bold text-foreground text-sm">{ex.name}</h4>
-                  <p className="text-xs text-muted-foreground">{ex.levelLabel} • {ex.sets}x{ex.reps}</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {ex.muscles.slice(0, 2).map(m => (
-                      <span key={m} className="text-xs bg-muted px-1.5 py-0.5 rounded text-muted-foreground">{m}</span>
-                    ))}
-                  </div>
-                </div>
-              </button>
-              <div className="flex items-center gap-2 shrink-0">
-                <button onClick={() => appState.toggleFavorite(ex.id)} className="w-8 h-8 rounded-full flex items-center justify-center">
-                  <Heart className={`w-4 h-4 ${appState.isFavorite(ex.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
-                </button>
+            <div key={ex.id} className="card-elevated p-2 flex flex-col">
+              <button
+                onClick={() => setSelected(ex)}
+                className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted active:scale-[0.98] transition-transform"
+              >
+                <img src={ex.image} alt={ex.name} loading="lazy" className="w-full h-full object-cover" />
+                <span className="absolute top-2 left-2 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-background/90 text-foreground">
+                  {ex.levelLabel}
+                </span>
                 {isDone && (
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                  <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-md">
                     <Check className="w-3 h-3 text-primary-foreground" />
                   </div>
                 )}
+              </button>
+              <div className="px-1 pt-2 pb-1 flex-1 flex flex-col">
+                <h4 className="font-bold text-foreground text-sm leading-tight line-clamp-2">{ex.name}</h4>
+                <p className="text-xs text-primary font-medium mt-1">{ex.sets} séries × {ex.reps}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {muscleEmojis[ex.muscleGroup] || "💪"} {ex.muscles.slice(0, 2).join(" · ")}
+                </p>
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
+                  <button
+                    onClick={() => appState.markExerciseDone(ex.id)}
+                    className="text-xs font-bold text-primary flex items-center gap-1"
+                  >
+                    <Check className="w-3 h-3" />
+                    {isDone ? "Feito" : "Marcar"}
+                  </button>
+                  <button onClick={() => appState.toggleFavorite(ex.id)} className="w-7 h-7 rounded-full flex items-center justify-center">
+                    <Heart className={`w-4 h-4 ${appState.isFavorite(ex.id) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                  </button>
+                </div>
               </div>
             </div>
           );
