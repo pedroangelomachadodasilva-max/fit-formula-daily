@@ -7,10 +7,7 @@ import { mealPlanDays, allowedFoods, avoidFoods } from "@/data/mealPlan";
 import { teas } from "@/data/teas";
 import { Heart, ArrowLeft, Lock, Check, ChevronRight, Flame, Target, Pencil } from "lucide-react";
 import { FoodImage } from "@/components/FoodImage";
-import breakfastImg from "@/assets/meals/breakfast.jpg";
-import lunchImg from "@/assets/meals/lunch.jpg";
-import snackImg from "@/assets/meals/snack.jpg";
-import dinnerImg from "@/assets/meals/dinner.jpg";
+import { dayMealImages } from "@/assets/meals/dayImages";
 
 type MealFilter = "all" | "breakfast" | "lunch" | "snack" | "dinner" | "lowcarb" | "dessert" | "tea";
 
@@ -238,10 +235,10 @@ const PlanningView = ({ onBack }: { onBack: () => void }) => {
         <h2 className="text-xl font-heading font-bold text-foreground mb-4">Dia {day.day}</h2>
         <div className="space-y-3">
           {[
-            { label: "☀️ Café da manhã", val: day.breakfast, img: breakfastImg },
-            { label: "🍽️ Almoço", val: day.lunch, img: lunchImg },
-            { label: "🍎 Lanche", val: day.snack, img: snackImg },
-            { label: "🌙 Jantar", val: day.dinner, img: dinnerImg },
+            { label: "☀️ Café da manhã", val: day.breakfast, img: dayMealImages[day.day].breakfast },
+            { label: "🍽️ Almoço", val: day.lunch, img: dayMealImages[day.day].lunch },
+            { label: "🍎 Lanche", val: day.snack, img: dayMealImages[day.day].snack },
+            { label: "🌙 Jantar", val: day.dinner, img: dayMealImages[day.day].dinner },
           ].map(m => (
             <div key={m.label} className="card-elevated overflow-hidden p-0">
               <img
