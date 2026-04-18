@@ -150,7 +150,7 @@ const GoalCalculator = ({ onBack }: { onBack: () => void }) => {
     const h = parseFloat(height);
     const a = parseInt(age);
     if (!w || !h || !a) return;
-    let bmr = gender === "feminino"
+    const bmr = gender === "feminino"
       ? 447.593 + 9.247 * w + 3.098 * h - 4.330 * a
       : 88.362 + 13.397 * w + 4.799 * h - 5.677 * a;
     const activityMultipliers: Record<string, number> = {

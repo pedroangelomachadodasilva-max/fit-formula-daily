@@ -13,13 +13,35 @@ import { SearchOverlay, FavoritesOverlay, ProfileOverlay, UpsellsOverlay, Compul
 import { ChatWidget } from "@/components/ChatWidget";
 import { LoginScreen } from "@/screens/LoginScreen";
 
-const AppContent = ({ pendingProfile }: { pendingProfile: any }) => {
+type PendingProfile = {
+  name?: string;
+  age?: string;
+  gender?: string;
+  height?: string;
+  weight?: string;
+  targetWeight?: string;
+  activityLevel?: string;
+  objective?: string;
+  calorieGoal?: number;
+} | null;
+
+type ProfileUpdates = {
+  name?: string;
+  age?: number;
+  gender?: string;
+  height?: number;
+  initialWeight?: number;
+  goal?: string;
+  activityLevel?: string;
+};
+
+const AppContent = ({ pendingProfile }: { pendingProfile: PendingProfile }) => {
   const { activeTab, showSearch, showFavorites, showProfile, showChat, setShowChat, subScreen, appState } = useApp();
 
   // Apply pending profile data once on mount
   useState(() => {
     if (pendingProfile) {
-      const updates: any = {};
+      const updates: ProfileUpdates = {};
       if (pendingProfile.name) updates.name = pendingProfile.name;
       if (pendingProfile.age) updates.age = parseInt(pendingProfile.age);
       if (pendingProfile.gender) updates.gender = pendingProfile.gender;
@@ -70,9 +92,9 @@ const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     try { return localStorage.getItem("formula-emagrecer-logged") === "true"; } catch { return false; }
   });
-  const [pendingProfile, setPendingProfile] = useState<any>(null);
+  const [pendingProfile, setPendingProfile] = useState<PendingProfile>(null);
 
-  const handleLogin = (profileData?: any) => {
+  const handleLogin = (profileData?: PendingProfile) => {
     if (profileData) setPendingProfile(profileData);
     localStorage.setItem("formula-emagrecer-logged", "true");
     setIsLoggedIn(true);

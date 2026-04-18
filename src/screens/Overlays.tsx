@@ -182,7 +182,7 @@ export const ProfileOverlay = () => {
                   <label className="text-xs text-muted-foreground">{f.label}</label>
                   <input
                     type={f.type}
-                    value={(form as any)[f.key]}
+                    value={(form as Record<string, string | number>)[f.key]}
                     onChange={e => setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })}
                     className="w-full mt-1 bg-muted rounded-xl px-3 py-2.5 text-foreground text-sm outline-none"
                   />
