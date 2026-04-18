@@ -72,7 +72,7 @@ function loadState(): AppState {
       }
       return { ...defaultState, ...parsed };
     }
-  } catch {}
+  } catch { /* ignore parse errors and fall back to default */ }
   return defaultState;
 }
 

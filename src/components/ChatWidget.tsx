@@ -55,11 +55,11 @@ export const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
   }, [messages]);
 
   useEffect(() => {
-    try { localStorage.setItem("fe-audio", String(isAudioEnabled)); } catch {}
+    try { localStorage.setItem("fe-audio", String(isAudioEnabled)); } catch { /* ignore storage errors */ }
   }, [isAudioEnabled]);
 
   useEffect(() => {
-    try { localStorage.setItem("fe-voice", selectedVoice); } catch {}
+    try { localStorage.setItem("fe-voice", selectedVoice); } catch { /* ignore storage errors */ }
   }, [selectedVoice]);
 
   const send = () => {
