@@ -7,6 +7,10 @@ import { mealPlanDays, allowedFoods, avoidFoods } from "@/data/mealPlan";
 import { teas } from "@/data/teas";
 import { Heart, ArrowLeft, Lock, Check, ChevronRight, Flame, Target, Pencil } from "lucide-react";
 import { FoodImage } from "@/components/FoodImage";
+import breakfastImg from "@/assets/meals/breakfast.jpg";
+import lunchImg from "@/assets/meals/lunch.jpg";
+import snackImg from "@/assets/meals/snack.jpg";
+import dinnerImg from "@/assets/meals/dinner.jpg";
 
 type MealFilter = "all" | "breakfast" | "lunch" | "snack" | "dinner" | "lowcarb" | "dessert" | "tea";
 
@@ -234,14 +238,24 @@ const PlanningView = ({ onBack }: { onBack: () => void }) => {
         <h2 className="text-xl font-heading font-bold text-foreground mb-4">Dia {day.day}</h2>
         <div className="space-y-3">
           {[
-            { label: "☀️ Café da manhã", val: day.breakfast },
-            { label: "🍽️ Almoço", val: day.lunch },
-            { label: "🍎 Lanche", val: day.snack },
-            { label: "🌙 Jantar", val: day.dinner },
+            { label: "☀️ Café da manhã", val: day.breakfast, img: breakfastImg },
+            { label: "🍽️ Almoço", val: day.lunch, img: lunchImg },
+            { label: "🍎 Lanche", val: day.snack, img: snackImg },
+            { label: "🌙 Jantar", val: day.dinner, img: dinnerImg },
           ].map(m => (
-            <div key={m.label} className="card-elevated">
-              <h4 className="font-bold text-foreground text-sm mb-1">{m.label}</h4>
-              <p className="text-sm text-muted-foreground">{m.val}</p>
+            <div key={m.label} className="card-elevated overflow-hidden p-0">
+              <img
+                src={m.img}
+                alt={m.label}
+                loading="lazy"
+                width={768}
+                height={512}
+                className="w-full h-32 object-cover"
+              />
+              <div className="p-4">
+                <h4 className="font-bold text-foreground text-sm mb-1">{m.label}</h4>
+                <p className="text-sm text-muted-foreground">{m.val}</p>
+              </div>
             </div>
           ))}
         </div>
