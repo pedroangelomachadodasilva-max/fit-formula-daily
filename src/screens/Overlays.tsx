@@ -277,7 +277,11 @@ export const UpsellsOverlay = () => {
               </div>
             </div>
           </button>
-          <div className={`card-elevated ${!state.access.doces ? "opacity-60" : ""}`}>
+          <button
+            onClick={() => state.access.doces && setSubScreen("doces")}
+            disabled={!state.access.doces}
+            className={`card-elevated w-full text-left ${!state.access.doces ? "opacity-60 cursor-not-allowed" : "active:scale-[0.98] transition-transform"}`}
+          >
             <div className="flex items-center gap-3">
               <span className="text-3xl">🍰</span>
               <div className="flex-1">
@@ -286,8 +290,12 @@ export const UpsellsOverlay = () => {
               </div>
               {!state.access.doces && <Lock className="w-5 h-5 text-muted-foreground" />}
             </div>
-          </div>
-          <div className={`card-elevated ${!state.access.peleFlacida ? "opacity-60" : ""}`}>
+          </button>
+          <button
+            onClick={() => state.access.peleFlacida && setSubScreen("peleflacida")}
+            disabled={!state.access.peleFlacida}
+            className={`card-elevated w-full text-left ${!state.access.peleFlacida ? "opacity-60 cursor-not-allowed" : "active:scale-[0.98] transition-transform"}`}
+          >
             <div className="flex items-center gap-3">
               <span className="text-3xl">✨</span>
               <div className="flex-1">
@@ -296,7 +304,7 @@ export const UpsellsOverlay = () => {
               </div>
               {!state.access.peleFlacida && <Lock className="w-5 h-5 text-muted-foreground" />}
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>
