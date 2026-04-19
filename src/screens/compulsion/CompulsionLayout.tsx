@@ -9,26 +9,25 @@ interface CompulsionLayoutProps {
   children: ReactNode;
 }
 
+// Layout integrado: ocupa o main, mantendo AppHeader (sticky) e BottomNav visíveis.
 export const CompulsionLayout = ({ title, emoji, onBack, onClose, children }: CompulsionLayoutProps) => (
-  <div className="fixed inset-0 z-50 bg-background animate-slide-up">
-    <div className="app-container h-full flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b border-border bg-card/80 backdrop-blur">
-        <div className="flex items-center gap-2">
-          {onBack && (
-            <button onClick={onBack} className="p-1.5 rounded-full hover:bg-muted">
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </button>
-          )}
-          <h2 className="font-heading font-bold text-foreground text-lg">
-            {emoji && <span className="mr-1.5">{emoji}</span>}
-            {title}
-          </h2>
-        </div>
-        <button onClick={onClose} className="p-1.5 rounded-full hover:bg-muted">
-          <X className="w-5 h-5 text-foreground" />
-        </button>
+  <div className="animate-slide-up">
+    <div className="sticky top-[57px] z-30 flex items-center justify-between px-4 py-3 border-b border-border bg-card/90 backdrop-blur">
+      <div className="flex items-center gap-2 min-w-0">
+        {onBack && (
+          <button onClick={onBack} className="p-1.5 rounded-full hover:bg-muted shrink-0">
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+        )}
+        <h2 className="font-heading font-bold text-foreground text-base truncate">
+          {emoji && <span className="mr-1.5">{emoji}</span>}
+          {title}
+        </h2>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">{children}</div>
+      <button onClick={onClose} className="p-1.5 rounded-full hover:bg-muted shrink-0">
+        <X className="w-5 h-5 text-foreground" />
+      </button>
     </div>
+    <div className="px-4 py-4 pb-28 space-y-4">{children}</div>
   </div>
 );
