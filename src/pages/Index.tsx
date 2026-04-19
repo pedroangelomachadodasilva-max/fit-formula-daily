@@ -11,6 +11,7 @@ import { CameraScreen } from "@/screens/CameraScreen";
 import { ProgressScreen } from "@/screens/ProgressScreen";
 import { SearchOverlay, FavoritesOverlay, ProfileOverlay, UpsellsOverlay } from "@/screens/Overlays";
 import { CompulsionModule } from "@/screens/compulsion/CompulsionModule";
+import { SkinModule } from "@/screens/skin/SkinModule";
 import { ChatWidget } from "@/components/ChatWidget";
 import { LoginScreen } from "@/screens/LoginScreen";
 
@@ -58,6 +59,9 @@ const AppContent = ({ pendingProfile }: { pendingProfile: PendingProfile }) => {
   });
 
   const renderScreen = () => {
+    // Sub-screens integrados ao layout principal (mantêm header e bottom nav visíveis)
+    if (subScreen === "compulsion") return <CompulsionModule />;
+    if (subScreen === "peleflacida") return <SkinModule />;
     switch (activeTab) {
       case "home": return <HomeScreen />;
       case "tea": return <TeaScreen />;
@@ -82,7 +86,6 @@ const AppContent = ({ pendingProfile }: { pendingProfile: PendingProfile }) => {
       {showFavorites && <FavoritesOverlay />}
       {showProfile && <ProfileOverlay />}
       {subScreen === "upsells" && <UpsellsOverlay />}
-      {subScreen === "compulsion" && <CompulsionModule />}
 
       <ChatWidget isOpen={showChat} onClose={() => setShowChat(false)} />
     </div>

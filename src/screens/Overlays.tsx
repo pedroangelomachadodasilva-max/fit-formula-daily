@@ -258,7 +258,7 @@ export const ProfileOverlay = () => {
 // ChatOverlay removed — replaced by ChatWidget component
 
 export const UpsellsOverlay = () => {
-  const { setSubScreen, appState } = useApp();
+  const { setSubScreen, setActiveTab, appState } = useApp();
   const { state } = appState;
   return (
     <div className="fixed inset-0 z-50 bg-background animate-slide-up">
@@ -268,7 +268,7 @@ export const UpsellsOverlay = () => {
           <button onClick={() => setSubScreen(null)}><X className="w-5 h-5 text-foreground" /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-          <button onClick={() => setSubScreen("compulsion")} className="card-highlight w-full text-left">
+          <button onClick={() => setSubScreen("compulsion")} className="card-highlight w-full text-left active:scale-[0.98] transition-transform">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🧠</span>
               <div>
@@ -277,7 +277,15 @@ export const UpsellsOverlay = () => {
               </div>
             </div>
           </button>
-          <div className={`card-elevated ${!state.access.doces ? "opacity-60" : ""}`}>
+          <button
+            onClick={() => {
+              if (!state.access.doces) return;
+              setActiveTab("meals");
+              setSubScreen("doces");
+            }}
+            disabled={!state.access.doces}
+            className={`card-elevated w-full text-left ${!state.access.doces ? "opacity-60 cursor-not-allowed" : "active:scale-[0.98] transition-transform"}`}
+          >
             <div className="flex items-center gap-3">
               <span className="text-3xl">🍰</span>
               <div className="flex-1">
@@ -286,8 +294,12 @@ export const UpsellsOverlay = () => {
               </div>
               {!state.access.doces && <Lock className="w-5 h-5 text-muted-foreground" />}
             </div>
-          </div>
-          <div className={`card-elevated ${!state.access.peleFlacida ? "opacity-60" : ""}`}>
+          </button>
+          <button
+            onClick={() => state.access.peleFlacida && setSubScreen("peleflacida")}
+            disabled={!state.access.peleFlacida}
+            className={`card-elevated w-full text-left ${!state.access.peleFlacida ? "opacity-60 cursor-not-allowed" : "active:scale-[0.98] transition-transform"}`}
+          >
             <div className="flex items-center gap-3">
               <span className="text-3xl">✨</span>
               <div className="flex-1">
@@ -296,7 +308,7 @@ export const UpsellsOverlay = () => {
               </div>
               {!state.access.peleFlacida && <Lock className="w-5 h-5 text-muted-foreground" />}
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>

@@ -206,6 +206,23 @@ export const HomeScreen = () => {
         </div>
       </div>
 
+      {/* Atalho destacado para Compulsão Alimentar */}
+      <button
+        onClick={() => setSubScreen("compulsion")}
+        className="card-highlight w-full text-left active:scale-[0.98] transition-transform"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">🧠</span>
+          <div className="flex-1">
+            <p className="text-xs font-medium text-primary uppercase tracking-wider">Apoio emocional</p>
+            <h3 className="font-bold text-foreground mt-0.5">Compulsão Alimentar</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-snug">
+              Ansiedade, gatilhos, respiração e plano anti-crise quando precisar.
+            </p>
+          </div>
+        </div>
+      </button>
+
       {/* Quick shortcuts */}
       <div>
         <h3 className="section-title mb-3">Atalhos</h3>

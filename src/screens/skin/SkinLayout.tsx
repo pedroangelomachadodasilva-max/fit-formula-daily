@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { ArrowLeft, X } from "lucide-react";
 
-interface CompulsionLayoutProps {
+interface SkinLayoutProps {
   title: string;
   emoji?: string;
   onBack?: () => void;
@@ -9,8 +9,9 @@ interface CompulsionLayoutProps {
   children: ReactNode;
 }
 
-// Layout integrado: ocupa o main, mantendo AppHeader (sticky) e BottomNav visíveis.
-export const CompulsionLayout = ({ title, emoji, onBack, onClose, children }: CompulsionLayoutProps) => (
+// Layout integrado: ocupa o espaço do main, NÃO usa fixed inset-0,
+// para preservar o AppHeader e o BottomNav globais do app.
+export const SkinLayout = ({ title, emoji, onBack, onClose, children }: SkinLayoutProps) => (
   <div className="animate-slide-up">
     <div className="sticky top-[57px] z-30 flex items-center justify-between px-4 py-3 border-b border-border bg-card/90 backdrop-blur">
       <div className="flex items-center gap-2 min-w-0">
