@@ -278,7 +278,11 @@ export const UpsellsOverlay = () => {
             </div>
           </button>
           <button
-            onClick={() => state.access.doces && setSubScreen("doces")}
+            onClick={() => {
+              if (!state.access.doces) return;
+              setActiveTab("meals");
+              setSubScreen("doces");
+            }}
             disabled={!state.access.doces}
             className={`card-elevated w-full text-left ${!state.access.doces ? "opacity-60 cursor-not-allowed" : "active:scale-[0.98] transition-transform"}`}
           >
