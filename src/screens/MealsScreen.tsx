@@ -334,6 +334,12 @@ export const MealsScreen = () => {
   const [filter, setFilter] = useState<MealFilter>("all");
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
+  // Quando vem do upsell "Doces Fitness", aplica filtro automaticamente.
+  if (subScreen === "doces" && filter !== "dessert") {
+    setFilter("dessert");
+    setSubScreen(null);
+  }
+
   if (subScreen === "planning") return <PlanningView onBack={() => setSubScreen(null)} />;
   if (selectedRecipe) return <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} />;
 
