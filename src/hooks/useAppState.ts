@@ -70,6 +70,8 @@ function loadState(): AppState {
       if (parsed.dailyLog?.date !== today()) {
         parsed.dailyLog = defaultDailyLog();
       }
+      // Force unlock upsells regardless of stored state
+      parsed.access = { ...defaultState.access, ...(parsed.access || {}), doces: true, peleFlacida: true };
       return { ...defaultState, ...parsed };
     }
   } catch { /* ignore parse errors and fall back to default */ }
