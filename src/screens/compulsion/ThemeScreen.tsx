@@ -453,7 +453,7 @@ export const ThemeScreen = ({ themeId, onBack, onClose }: ThemeScreenProps) => {
       emoji: "🧠",
       render: () => <PhysicalVsEmotional />,
     },
-    triggers: { title: "Gatilhos Emocionais", emoji: "🎯", render: () => <Triggers /> },
+    triggers: { title: "Gatilhos Emocionais", emoji: "🎯", render: () => <Triggers onNavigate={onNavigate} /> },
     anxiety: {
       title: "Ansiedade",
       emoji: "😰",
