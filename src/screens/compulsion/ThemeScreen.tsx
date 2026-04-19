@@ -446,7 +446,7 @@ const AfterEpisode = () => (
   </>
 );
 
-export const ThemeScreen = ({ themeId, onBack, onClose }: ThemeScreenProps) => {
+export const ThemeScreen = ({ themeId, onBack, onClose, onNavigate }: ThemeScreenProps) => {
   const config: Record<string, { title: string; emoji: string; render: () => React.ReactNode }> = {
     "physical-vs-emotional": {
       title: "Fome Física vs Emocional",
