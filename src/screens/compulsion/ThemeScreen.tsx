@@ -6,8 +6,12 @@ import { PauseTimer } from "./PauseTimer";
 import {
   alternatives,
   emotionalSigns,
+  getNextSteps,
+  getTriggerPattern,
   physicalSigns,
   physicalVsEmotionalQuiz,
+  triggerIdentifyQuestions,
+  triggerTips,
   triggersList,
 } from "@/data/compulsionContent";
 import { useCompulsionState } from "@/hooks/useCompulsionState";
@@ -134,43 +138,135 @@ const PhysicalVsEmotional = () => {
   );
 };
 
-const Triggers = () => {
+const Triggers = ({ onNavigate }: { onNavigate: (id: string) => void }) => {
   const { state, toggleTrigger } = useCompulsionState();
+  const selected = state.selectedTriggers;
+  const pattern = getTriggerPattern(selected);
+  const nextSteps = getNextSteps(selected);
+  const selectedItems = triggersList.filter((t) => selected.includes(t.id));
+
   return (
     <>
       <div className="card-highlight">
         <p className="text-sm text-foreground leading-relaxed">
-          Gatilhos são situações, emoções ou ambientes que disparam a vontade de comer por impulso.
-          Marque os seus para começar a perceber padrões.
+          Gatilhos são situações, emoções, horários ou ambientes que aumentam a vontade de comer por
+          impulso. Identificá-los ajuda a quebrar padrões — você não precisa acertar tudo de primeira,
+          observe aos poucos.
         </p>
       </div>
+
       <div className="card-elevated">
-        <h3 className="font-heading font-bold text-foreground mb-3">Marque seus gatilhos</h3>
+        <h3 className="font-heading font-bold text-foreground mb-2">🔎 Como identificar seus gatilhos</h3>
+        <p className="text-xs text-muted-foreground mb-3">
+          Use estas perguntas como ponto de partida — só observar já é um começo.
+        </p>
+        <ul className="space-y-2">
+          {triggerIdentifyQuestions.map((q) => (
+            <li key={q} className="text-sm text-foreground flex gap-2 leading-snug">
+              <span className="text-primary shrink-0">•</span>
+              {q}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="card-elevated">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-heading font-bold text-foreground">Marque seus gatilhos</h3>
+          {selected.length > 0 && (
+            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
+              {selected.length} {selected.length === 1 ? "marcado" : "marcados"}
+            </span>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2">
           {triggersList.map((t) => {
-            const sel = state.selectedTriggers.includes(t.id);
+            const sel = selected.includes(t.id);
             return (
               <button
                 key={t.id}
                 onClick={() => toggleTrigger(t.id)}
-                className={`px-3 py-2 rounded-full text-xs font-medium transition-colors ${
-                  sel ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                className={`px-3 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                  sel
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-muted text-foreground hover:bg-muted/70"
                 }`}
               >
-                {sel && "✓ "}
+                <span>{t.emoji}</span>
+                {sel && <Check className="w-3 h-3" />}
                 {t.label}
               </button>
             );
           })}
         </div>
-        {state.selectedTriggers.length > 0 && (
-          <p className="text-xs text-muted-foreground mt-3">
-            Você marcou {state.selectedTriggers.length}{" "}
-            {state.selectedTriggers.length === 1 ? "gatilho" : "gatilhos"}. Use o Diário Emocional
-            para registrar quando eles aparecerem.
-          </p>
-        )}
       </div>
+
+      {pattern && (
+        <div className="card-elevated bg-primary/5 border-primary/20">
+          <p className="text-xs font-bold text-primary uppercase tracking-wide mb-1">💡 Padrão percebido</p>
+          <p className="text-sm text-foreground leading-relaxed">{pattern}</p>
+        </div>
+      )}
+
+      {selectedItems.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="section-title px-1">🎯 Dicas para os seus gatilhos</h3>
+          {selectedItems.map((t) => (
+            <div key={t.id} className="card-elevated">
+              <p className="font-bold text-foreground text-sm flex items-center gap-2">
+                <span>{t.emoji}</span>
+                {t.label}
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {(triggerTips[t.id] || []).map((tip) => (
+                  <li key={tip} className="text-sm text-foreground flex gap-2 leading-snug">
+                    <span className="text-primary shrink-0">→</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {nextSteps.length > 0 && (
+        <div className="card-highlight">
+          <p className="text-xs font-bold text-primary uppercase tracking-wide mb-2">
+            ✨ O que você pode fazer hoje
+          </p>
+          <ul className="space-y-1.5">
+            {nextSteps.map((s) => (
+              <li key={s} className="text-sm text-foreground flex gap-2 leading-snug">
+                <span className="text-primary shrink-0">•</span>
+                {s}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="card-elevated">
+        <h3 className="font-heading font-bold text-foreground text-sm mb-3">Áreas relacionadas</h3>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: "diary", label: "📔 Diário Emocional" },
+            { id: "anxiety", label: "😰 Ansiedade" },
+            { id: "breathing", label: "🌬️ Respiração" },
+            { id: "pause", label: "⏸️ Pausar antes de comer" },
+            { id: "anti-crisis", label: "🆘 Plano Anti-Crise" },
+          ].map((a) => (
+            <button
+              key={a.id}
+              onClick={() => onNavigate(a.id)}
+              className="bg-muted hover:bg-muted/70 rounded-xl px-3 py-2.5 text-xs font-medium text-foreground text-left transition-colors"
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <ActionToolbar id="theme-triggers" />
     </>
   );
