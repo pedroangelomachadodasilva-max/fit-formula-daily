@@ -9,7 +9,8 @@ import { MealsScreen } from "@/screens/MealsScreen";
 import { ExercisesScreen } from "@/screens/ExercisesScreen";
 import { CameraScreen } from "@/screens/CameraScreen";
 import { ProgressScreen } from "@/screens/ProgressScreen";
-import { SearchOverlay, FavoritesOverlay, ProfileOverlay, UpsellsOverlay, CompulsionOverlay } from "@/screens/Overlays";
+import { SearchOverlay, FavoritesOverlay, ProfileOverlay, UpsellsOverlay } from "@/screens/Overlays";
+import { CompulsionModule } from "@/screens/compulsion/CompulsionModule";
 import { ChatWidget } from "@/components/ChatWidget";
 import { LoginScreen } from "@/screens/LoginScreen";
 
