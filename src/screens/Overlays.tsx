@@ -4,7 +4,7 @@ import { teas } from "@/data/teas";
 import { lowCarbRecipes } from "@/data/lowCarb";
 import { salads } from "@/data/salads";
 import { exercises } from "@/data/exercises";
-import { compulsionTips } from "@/data/compulsion";
+
 import { useState } from "react";
 import { Lock } from "lucide-react";
 import { FoodImage } from "@/components/FoodImage";
