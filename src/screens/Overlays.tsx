@@ -4,7 +4,7 @@ import { teas } from "@/data/teas";
 import { lowCarbRecipes } from "@/data/lowCarb";
 import { salads } from "@/data/salads";
 import { exercises } from "@/data/exercises";
-import { compulsionTips } from "@/data/compulsion";
+
 import { useState } from "react";
 import { Lock } from "lucide-react";
 import { FoodImage } from "@/components/FoodImage";
@@ -303,27 +303,5 @@ export const UpsellsOverlay = () => {
   );
 };
 
-export const CompulsionOverlay = () => {
-  const { setSubScreen } = useApp();
-  return (
-    <div className="fixed inset-0 z-50 bg-background animate-slide-up">
-      <div className="app-container h-full flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="font-heading font-bold text-foreground text-lg">🧠 Compulsão Alimentar</h2>
-          <button onClick={() => setSubScreen(null)}><X className="w-5 h-5 text-foreground" /></button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-          {compulsionTips.map(tip => (
-            <div key={tip.id} className="card-elevated">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{tip.icon}</span>
-                <h3 className="font-bold text-foreground text-sm">{tip.title}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{tip.content}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// CompulsionOverlay removed — replaced by CompulsionModule (src/screens/compulsion)
+
