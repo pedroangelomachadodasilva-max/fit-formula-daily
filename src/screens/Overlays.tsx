@@ -258,7 +258,7 @@ export const ProfileOverlay = () => {
 // ChatOverlay removed — replaced by ChatWidget component
 
 export const UpsellsOverlay = () => {
-  const { setSubScreen, appState } = useApp();
+  const { setSubScreen, setActiveTab, appState } = useApp();
   const { state } = appState;
   return (
     <div className="fixed inset-0 z-50 bg-background animate-slide-up">
@@ -268,7 +268,7 @@ export const UpsellsOverlay = () => {
           <button onClick={() => setSubScreen(null)}><X className="w-5 h-5 text-foreground" /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-          <button onClick={() => setSubScreen("compulsion")} className="card-highlight w-full text-left">
+          <button onClick={() => setSubScreen("compulsion")} className="card-highlight w-full text-left active:scale-[0.98] transition-transform">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🧠</span>
               <div>
