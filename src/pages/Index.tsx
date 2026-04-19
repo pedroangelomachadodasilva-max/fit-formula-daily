@@ -82,7 +82,7 @@ const AppContent = ({ pendingProfile }: { pendingProfile: PendingProfile }) => {
       {showFavorites && <FavoritesOverlay />}
       {showProfile && <ProfileOverlay />}
       {subScreen === "upsells" && <UpsellsOverlay />}
-      {subScreen === "compulsion" && <CompulsionOverlay />}
+      {subScreen === "compulsion" && <CompulsionModule />}
 
       <ChatWidget isOpen={showChat} onClose={() => setShowChat(false)} />
     </div>
