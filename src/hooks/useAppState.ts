@@ -57,7 +57,7 @@ const defaultState: AppState = {
     password: "••••••••"
   },
   access: {
-    main: true, doces: false, peleFlacida: false,
+    main: true, doces: true, peleFlacida: true,
     subscriptionActive: true, subscriptionDueDate: "2025-05-14"
   }
 };
