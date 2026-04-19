@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "@/contexts/AppContext";
 import { lowCarbRecipes, Recipe } from "@/data/lowCarb";
 import { salads } from "@/data/salads";
@@ -335,10 +335,12 @@ export const MealsScreen = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   // Quando vem do upsell "Doces Fitness", aplica filtro automaticamente.
-  if (subScreen === "doces" && filter !== "dessert") {
-    setFilter("dessert");
-    setSubScreen(null);
-  }
+  useEffect(() => {
+    if (subScreen === "doces") {
+      setFilter("dessert");
+      setSubScreen(null);
+    }
+  }, [subScreen, setSubScreen]);
 
   if (subScreen === "planning") return <PlanningView onBack={() => setSubScreen(null)} />;
   if (selectedRecipe) return <RecipeDetail recipe={selectedRecipe} onBack={() => setSelectedRecipe(null)} />;
